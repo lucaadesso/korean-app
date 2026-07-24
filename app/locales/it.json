@@ -1,0 +1,15 @@
+{
+  "settings": {
+    "title": "Impostazioni",
+    "language": "Lingua interfaccia",
+    "save": "Salva Impostazioni",
+    "saved": "Impostazioni salvate con successo!"
+  },
+  "dashboard": {
+    "ready": "Pronti per studiare?",
+    "placement_title": "Hai già studiato in passato?",
+    "placement_desc": "Fai il test di posizionamento per saltare le basi che già conosci e configurare subito il tuo profilo.",
+    "impara": "Impara",
+    "ripassa": "Ripassa"
+  }
+}

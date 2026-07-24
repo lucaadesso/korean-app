@@ -43,6 +43,7 @@ class User(Base):
     target_daily_minutes   = Column(Integer, default=20)   # soft cap in minutes
     target_daily_new_cards = Column(Integer, default=5)    # new cards per day via Learn
     strict_mode            = Column(Boolean, default=False) # True → hard redirect to Zen
+    language               = Column(String, default="it")   # UI language
 
     reviews = relationship("ReviewLog", back_populates="user", cascade="all, delete-orphan")
     daily_studies = relationship("DailyStudy", back_populates="user", cascade="all, delete-orphan")

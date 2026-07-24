@@ -17,6 +17,7 @@ Routes:
 import os
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -27,6 +28,7 @@ from app.auth import get_current_user, require_user, router as auth_router, _Log
 from app.database import Base, engine, get_db
 from app.models import Card, ReviewLog, UserCard
 from app import srs
+from app.i18n import get_translator
 
 # ─── App & Middleware ─────────────────────────────────────────────────────────
 
@@ -67,12 +69,9 @@ def on_startup():
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, db: Session = Depends(get_db)):
-    user = get_current_user(request, db)
-    if user:
-        return RedirectResponse(url="/dashboard")
-    error = request.query_params.get("error")
-    return templates.TemplateResponse("login.html", {"request": request, "error": error})
+async def login_page(request: Request):
+    t = get_translator("it")
+    return templates.TemplateResponse("login.html", {"request": request, "t": t, "error": request.query_params.get("error")})
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -104,7 +103,8 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
         for uc in introduced_today_ucs
     ]
 
-    return templates.TemplateResponse("dashboard.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("dashboard.html", {"t": t, 
         "request":           request,
         "user":              user,
         "ts":                ts,
@@ -137,7 +137,8 @@ async def learn_home(request: Request, db: Session = Depends(get_db)):
     learn_cards   = srs.get_learn_cards_for_session(db, user)
     progress      = srs.get_dashboard_progress(db, user)
 
-    return templates.TemplateResponse("learn_home.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("learn_home.html", {"t": t, 
         "request":       request,
         "user":          user,
         "ts":            ts,
@@ -162,7 +163,8 @@ async def learn_card(request: Request, db: Session = Depends(get_db)):
 
     session_cards = srs.get_learn_cards_for_session(db, user)
     if not session_cards:
-        return templates.TemplateResponse("learn_done.html", {
+        t = get_translator(user.language if user else 'it')
+        return templates.TemplateResponse("learn_done.html", {"t": t, 
             "request": request, "user": user, "ts": ts,
             "over_limit": False, "congratulate": True,
         })
@@ -171,7 +173,8 @@ async def learn_card(request: Request, db: Session = Depends(get_db)):
     card = db.query(Card).filter(Card.id == uc.card_id).first()
     remaining = len(session_cards)
 
-    return templates.TemplateResponse("learn_card.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("learn_card.html", {"t": t, 
         "request":           request,
         "user":              user,
         "uc":                uc,
@@ -206,7 +209,8 @@ async def submit_learn(uc_id: int, request: Request, db: Session = Depends(get_d
     remaining = srs.get_learn_cards_for_session(db, user)
 
     if not remaining:
-        return templates.TemplateResponse("learn_done.html", {
+        t = get_translator(user.language if user else 'it')
+        return templates.TemplateResponse("learn_done.html", {"t": t, 
             "request":     request, "user": user, "ts": ts,
             "over_limit":  ts["over_target"],
             "congratulate": True,
@@ -214,7 +218,8 @@ async def submit_learn(uc_id: int, request: Request, db: Session = Depends(get_d
 
     # Over target but not strict mode → continue, soft warning shown by next card page
     if ts["over_target"] and user.strict_mode:
-        return templates.TemplateResponse("learn_done.html", {
+        t = get_translator(user.language if user else 'it')
+        return templates.TemplateResponse("learn_done.html", {"t": t, 
             "request":      request, "user": user, "ts": ts,
             "over_limit":   True, "congratulate": False,
         })
@@ -235,10 +240,12 @@ async def review_start(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse(url="/zen")
     due_count = len(srs.get_due_cards(db, user))
     if due_count == 0:
-        return templates.TemplateResponse("review_done.html", {
+        t = get_translator(user.language if user else 'it')
+        return templates.TemplateResponse("review_done.html", {"t": t, 
             "request": request, "user": user, "ts": ts,
         })
-    return templates.TemplateResponse("review_start.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("review_start.html", {"t": t, 
         "request": request, "user": user, "due_count": due_count, "ts": ts,
     })
 
@@ -253,7 +260,8 @@ async def review_page(request: Request, db: Session = Depends(get_db)):
 
     due_cards = srs.get_due_cards(db, user)
     if not due_cards:
-        return templates.TemplateResponse("review_done.html", {
+        t = get_translator(user.language if user else 'it')
+        return templates.TemplateResponse("review_done.html", {"t": t, 
             "request": request, "user": user, "ts": ts,
         })
 
@@ -261,7 +269,8 @@ async def review_page(request: Request, db: Session = Depends(get_db)):
     card      = db.query(Card).filter(Card.id == first_uc.card_id).first()
     remaining = len(due_cards)
 
-    return templates.TemplateResponse("review.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("review.html", {"t": t, 
         "request":           request,
         "user":              user,
         "uc":                first_uc,
@@ -326,7 +335,8 @@ async def zen_mode(request: Request, db: Session = Depends(get_db)):
     zen_words  = srs.get_zen_words(db, user)
     first_word = zen_words[0] if zen_words else None
 
-    return templates.TemplateResponse("zen_mode.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("zen_mode.html", {"t": t, 
         "request":    request,
         "user":       user,
         "ts":         ts,
@@ -350,7 +360,8 @@ async def zen_word(
     user  = require_user(request, db)
     words = srs.get_zen_words(db, user, exclude_id=exclude if exclude else None)
     word  = words[0] if words else None
-    return templates.TemplateResponse("zen_word_puzzle.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("zen_word_puzzle.html", {"t": t, 
         "request": request,
         "word":    word,
         "total":   len(words),
@@ -375,7 +386,8 @@ async def zen_word_check(word_id: int, request: Request, db: Session = Depends(g
     # Count words still available (exclude current)
     words_left = srs.get_zen_words(db, user, exclude_id=word_id)
 
-    return templates.TemplateResponse("zen_word_result.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("zen_word_result.html", {"t": t, 
         "request":    request,
         "word":       word,
         "is_correct": is_correct,
@@ -395,7 +407,8 @@ async def zen_word_hint(word_id: int, request: Request, db: Session = Depends(ge
 
     words_left = srs.get_zen_words(db, user, exclude_id=word_id)
 
-    return templates.TemplateResponse("zen_word_result.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("zen_word_result.html", {"t": t, 
         "request":    request,
         "word":       word,
         "is_correct": None,   # None = shown via hint (no judgement)
@@ -434,36 +447,35 @@ async def settings_page(request: Request, db: Session = Depends(get_db)):
     user  = require_user(request, db)
     ts    = srs.time_status(db, user)
     saved = request.query_params.get("saved") == "1"
+    t = get_translator(user.language if user else 'it')
     return templates.TemplateResponse("settings.html", {
+        "t": t, 
         "request": request,
         "user":    user,
         "ts":      ts,
-        "saved":   saved,
+        "saved":   saved
     })
 
 
 @app.post("/settings", response_class=HTMLResponse)
-async def update_settings(request: Request, db: Session = Depends(get_db)):
+async def update_settings(
+    request: Request,
+    target_daily_minutes: int = Form(20),
+    target_daily_new_cards: int = Form(5),
+    strict_mode: bool = Form(False),
+    language: str = Form("it"),
+    db: Session = Depends(get_db)
+):
     user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/", status_code=303)
-    
-    form = await request.form()
-    try:
-        minutes = int(form.get("target_daily_minutes", 20))
-        new_cards = int(form.get("target_daily_new_cards", 5))
-        if minutes < 5: minutes = 5
-        if minutes > 120: minutes = 120
-        if new_cards < 1: new_cards = 1
-        if new_cards > 50: new_cards = 50
-    except ValueError:
-        minutes = 20
-        new_cards = 5
         
-    user.target_daily_minutes   = minutes
-    user.target_daily_new_cards = new_cards
+    user.target_daily_minutes = target_daily_minutes
+    user.target_daily_new_cards = target_daily_new_cards
+    user.strict_mode = strict_mode
+    user.language = language
     db.commit()
-    return RedirectResponse(url="/dashboard", status_code=303)
+    return RedirectResponse(url="/settings?saved=1", status_code=303)
 
 
 # ─── Placement Test ──────────────────────────────────────────────────────────
@@ -474,7 +486,8 @@ async def placement_test(request: Request, db: Session = Depends(get_db)):
     if not user:
         return RedirectResponse(url="/", status_code=303)
     
-    return templates.TemplateResponse("placement.html", {
+    t = get_translator(user.language if user else 'it')
+    return templates.TemplateResponse("placement.html", {"t": t, 
         "request": request,
         "jamo_groups": srs.JAMO_GROUP_ORDER,
         "syllable_groups": srs.SYLLABLE_GROUP_ORDER,

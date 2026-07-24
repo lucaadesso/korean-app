@@ -1,0 +1,15 @@
+{
+  "settings": {
+    "title": "Settings",
+    "language": "Interface Language",
+    "save": "Save Settings",
+    "saved": "Settings saved successfully!"
+  },
+  "dashboard": {
+    "ready": "Ready to study?",
+    "placement_title": "Have you studied in the past?",
+    "placement_desc": "Take the placement test to skip the basics you already know and configure your profile.",
+    "impara": "Learn",
+    "ripassa": "Review"
+  }
+}

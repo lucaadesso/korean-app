@@ -119,18 +119,18 @@
       <h1 style="font-size:1.7rem; font-weight:700; margin-bottom:.2rem;">
         안녕하세요, {{ user.name.split(' ')[0] }}님! 👋
       </h1>
-      <p style="color:var(--text-muted); font-size:.9rem;">Pronti per studiare il coreano?</p>
+      <p style="color:var(--text-muted); font-size:.9rem;">{{ t('dashboard.ready') }}</p>
     </div>
     <div style="display:flex; gap:.7rem; flex-wrap:wrap;">
       {% if learn_count > 0 %}
       <a href="/learn" class="btn btn-primary btn-lg" id="start-learn-btn">
-        🌱 Impara
+        🌱 {{ t('dashboard.impara') }}
         <span style="background:rgba(255,255,255,.25); border-radius:100px; padding:.1rem .5rem; font-size:.8rem; margin-left:.3rem;">{{ learn_count }} nuove</span>
       </a>
       {% endif %}
       {% if due_count > 0 %}
       <a href="/review/start" class="btn btn-glass btn-lg" id="start-review-btn">
-        📚 Ripassa
+        📚 {{ t('dashboard.ripassa') }}
         <span style="background:rgba(255,255,255,.12); border-radius:100px; padding:.1rem .5rem; font-size:.8rem; margin-left:.3rem;">{{ due_count }}</span>
       </a>
       {% endif %}
@@ -144,9 +144,9 @@
   <!-- Placement Test Banner -->
   <div class="alert alert-warn" style="margin-bottom:1.5rem; display:flex; gap:1rem; align-items:center; justify-content:space-between;">
     <div>
-      <div style="font-weight:700; margin-bottom:.3rem; color:var(--text-primary);">Hai già studiato in passato?</div>
+      <div style="font-weight:700; margin-bottom:.3rem; color:var(--text-primary);">{{ t('dashboard.placement_title') }}</div>
       <div style="font-size:.85rem; color:var(--text-muted);">
-        Fai il test di posizionamento per saltare le basi che già conosci e configurare subito il tuo profilo.
+        {{ t('dashboard.placement_desc') }}
       </div>
     </div>
     <a href="/placement" class="btn btn-primary" style="white-space:nowrap;">Inizia il Test</a>

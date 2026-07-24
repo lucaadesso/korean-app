@@ -1,0 +1,1933 @@
+
+--- app/templates/base.html ---
+Esci
+Il cervello impara meglio a piccole dosi. Hai già completato il tuo obiettivo di studio.
+        Vuoi passare alla Zen Mode per consolidare, o continuare comunque?
+🪷 Vai alla Zen Mode
+{% block title %}한국어 — Korean Learning{% endblock %}
+{% endif %}
+{% block head %}{% endblock %}
+Korean
+Obiettivo del giorno raggiunto!
+{% endif %}
+
+  {% block content %}{% endblock %}
+// ── Study-time heartbeat (pauses when window loses focus) ────
+    {% if user is defined and user %}
+    let _lastSent       = Date.now();
+    let _softCapShown   = sessionStorage.getItem('softCapDismissed') === '1';
+    let _focused        = !document.hidden;
+
+    function _sendAccumulated() {
+      const now   = Date.now();
+      const delta = Math.round((now - _lastSent) / 1000);
+      _lastSent   = now;
+      if (delta
+📚 Ripassa
+{% if user.picture %}
+Puoi cambiare il limite nelle
+{% block scripts %}{% endblock %}
+{% if user is defined and user %}
+r.json()).then(data => {
+        updateTimerUI(data);
+
+        // Soft cap: show modal instead of hard redirect (unless strict_mode)
+        if (data.over_target && !_softCapShown) {
+          if (data.strict_mode) {
+            window.location.href = '/zen';
+          } else {
+            _softCapShown = true;
+            showSoftCapModal();
+          }
+        }
+      }).catch(() => {});
+    }
+
+    function showSoftCapModal() {
+      const m = document.getElementById('softcap-modal');
+      if (m) m.classList.add('visible');
+    }
+
+    function dismissSoftCap() {
+      sessionStorage.setItem('softCapDismissed', '1');
+      const m = document.getElementById('softcap-modal');
+      if (m) m.classList.remove('visible');
+    }
+
+    function _onPause() {
+      if (!_focused) return;
+      _focused = false;
+      _sendAccumulated();
+    }
+    function _onResume() {
+      if (_focused) return;
+      _focused  = true;
+      _lastSent = Date.now();
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      document.hidden ? _onPause() : _onResume();
+    });
+    window.addEventListener('blur',  _onPause);
+    window.addEventListener('focus', _onResume);
+
+    setInterval(() => {
+      if (_focused) _sendAccumulated();
+    }, 10000);
+
+    function updateTimerUI(data) {
+      const fill = document.getElementById('time-fill');
+      const val  = document.getElementById('time-value');
+      if (!fill || !val) return;
+      fill.style.width = (data.pct_target || data.pct_hard) + '%';
+      fill.className   = 'progress-fill' +
+        (data.over_target ? ' full' : data.over_soft ? ' warn' : '');
+      val.textContent  = data.minutes_studied + ' min';
+    }
+    {% endif %}
+Continua comunque →
+Impostazioni
+🪷 Zen
+🌱 Impara
+/* ── Soft-cap warning modal ──────────────────────────────── */
+  #softcap-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13,13,20,.82);
+    backdrop-filter: blur(12px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }
+  #softcap-modal.visible { display: flex; }
+  .softcap-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0,170,255,.35);
+    border-radius: var(--radius-xl);
+    padding: 2.2rem 2rem;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(0,170,255,.25);
+    animation: popIn .35s cubic-bezier(.36,.07,.19,.97);
+  }
+  @keyframes popIn {
+    0%   { transform: scale(.85); opacity: 0; }
+    70%  { transform: scale(1.03); }
+    100% { transform: scale(1);   opacity: 1; }
+  }
+⚙️
+
+--- app/templates/placement.html ---
+{% endblock %}
+
+{% block content %}
+Livello stimato ${sMaxIdx + 1}/${sGroups.length}`;
+    
+    document.getElementById('result-text').innerHTML = text;
+}
+
+document.getElementById('answer-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') submitAnswer(true);
+});
+
+// Start
+renderQuestion();
+const jGroups = {{ jamo_groups | tojson }};
+const sGroups = {{ syllable_groups | tojson }};
+const jData = {{ j_data | tojson }};
+const sData = {{ s_data | tojson }};
+
+let currentPhase = 'jamo';
+let currentGroupIdx = 0;
+let currentItem = null;
+
+let jMaxIdx = -1;
+let sMaxIdx = -1;
+
+function normalise(s) { return s.trim().toLowerCase().replace(/\s+/g, ''); }
+
+function getQuestion(phase, groupName) {
+    const data = phase === 'jamo' ? jData : sData;
+    const candidates = data.filter(d => d[3] === groupName); // index 3 is group_name in data tuples
+    if (candidates.length === 0) return null;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function renderQuestion() {
+    const groups = currentPhase === 'jamo' ? jGroups : sGroups;
+    if (currentGroupIdx >= groups.length) {
+        nextPhase();
+        return;
+    }
+    
+    document.getElementById('phase-label').innerText = currentPhase.toUpperCase() + ' - Livello ' + (currentGroupIdx + 1);
+    
+    currentItem = getQuestion(currentPhase, groups[currentGroupIdx]);
+    if (!currentItem) {
+        nextPhase();
+        return;
+    }
+    
+    document.getElementById('char-display').innerText = currentItem[0]; // front
+    const inp = document.getElementById('answer-input');
+    inp.value = '';
+    inp.focus();
+}
+
+function nextPhase() {
+    if (currentPhase === 'jamo') {
+        currentPhase = 'syllable';
+        currentGroupIdx = 0;
+        renderQuestion();
+    } else {
+        finishTest();
+    }
+}
+
+function submitAnswer(attempted) {
+    if (!currentItem) return;
+    
+    const inp = document.getElementById('answer-input').value;
+    const isCorrect = attempted && (normalise(inp) === normalise(currentItem[1]) || normalise(inp) === normalise(currentItem[2]));
+    
+    if (isCorrect) {
+        if (currentPhase === 'jamo') jMaxIdx = currentGroupIdx;
+        if (currentPhase === 'syllable') sMaxIdx = currentGroupIdx;
+        currentGroupIdx++;
+        renderQuestion();
+    } else {
+        // Failed or "I don't know" -> stop phase
+        nextPhase();
+    }
+}
+
+function finishTest() {
+    document.getElementById('test-container').style.display = 'none';
+    document.getElementById('result-container').style.display = 'block';
+    
+    document.getElementById('j_max').value = jMaxIdx;
+    document.getElementById('s_max').value = sMaxIdx;
+    
+    let text = "Basato sulle tue risposte:
+Conferma
+Sillabe:
+Livello stimato ${jMaxIdx + 1}/${jGroups.length}
+Principiante Assoluto";
+    else text += `
+Valutazione Completata
+Principiante Assoluto
+Preparazione...
+Attiva Fast-Lane e Inizia 🚀
+Non lo so
+{% endblock %}
+
+{% block scripts %}
+`;
+    
+    if (sMaxIdx === -1) text += "
+Jamo:
+";
+    else text += `
+.test-card {
+  max-width: 500px;
+  margin: 3rem auto;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-glow);
+  text-align: center;
+}
+.char-display {
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+.quiz-input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+.quiz-input:focus { outline: none; border-color: var(--accent-1); }
+";
+    if (jMaxIdx === -1) text += "
+
+--- app/templates/zen_word_puzzle.html ---
+{% else %}
+Hai esaurito le parole disponibili. Impara più caratteri per sbloccare nuove parole!
+{% if word %}
+{% endif %}
+🇮🇹 {{ word.m }}
+🌱 Impara
+💡 Mostra risposta
+✓ Verifica
+
+--- app/templates/dashboard.html ---
+{% endif %}
+      {% if due_count > 0 %}
+🪷 Zen Mode
+{% endblock %}
+
+{% block content %}
+{% if progress.current_learn and progress.current_learn.phase == 'jamo' %}
+🎯 {{ ts.target_daily_minutes }} min
+🎌 Sillabe
+음절
+🔒 Sblocca all'80% Jamo (ora {{ progress.jamo.phase.pct_learned }}%)
+{% endif %}
+— {{ progress.current_learn.progress.learned }}/{{ progress.current_learn.progress.total }} appresi
+{% endif %}
+      {% if learn_count == 0 and due_count == 0 %}
+{% for c in learned_today_cards %}
+🔤 Jamo
+⚡ {{ (ts.target_daily_minutes * 0.75) | int }} min
+300-500 parole ad alta frequenza + espressioni quotidiane. Sbloccato quando Jamo e Sillabe sono completati.
+questo mese
+{% for g in progress.syllable.groups %}
+        {% set is_current = progress.current_learn and progress.current_learn.phase == 'syllable' and progress.current_learn.group == g.group %}
+        {% set tile_class = 'complete' if g.complete else ('active' if is_current else 'locked') %}
+📖 Vocaboli & Frasi
+. Questo evita il sovraccarico cognitivo e favorisce una memorizzazione a lungo termine. Una volta introdotti, i caratteri riappariranno per un ripasso dopo 10 minuti. Non preoccuparti, il ritmo accelererà naturalmente nei prossimi giorni!
+⏱️ Tempo di studio oggi
+0 %}
+carte introdotte
+Perché imparo così poco all'inizio?
+{% endfor %}
+Fai il test di posizionamento per saltare le basi che già conosci e configurare subito il tuo profilo.
+🌟 Giorni Attivi
+🔒 Disponibile dopo le Sillabe
+{% if learned_today_cards %}
+max 25/giorno
+{% for g in progress.syllable.groups %}
+📚 Ripassa
+Il nostro algoritmo SRS limita di proposito l'introduzione di nuovi concetti a
+📚 Da Ripassare
+pochi caratteri al giorno
+/* ── Group progress grid ──────────────────────────────── */
+.phase-section {
+  margin-bottom: 2rem;
+}
+.phase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .8rem;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.phase-title {
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.phase-pct {
+  font-size: .82rem;
+  color: var(--text-muted);
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: .2rem .75rem;
+}
+.locked-badge {
+  font-size: .72rem;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: .2rem .75rem;
+  color: var(--text-dim);
+}
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: .6rem;
+}
+.group-tile {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: .7rem .5rem;
+  text-align: center;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.group-tile::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  transition: width .5s ease;
+}
+.group-tile.complete { border-color: rgba(94,231,160,.4); }
+.group-tile.complete::after { width: 100%; background: var(--accent-ok); }
+.group-tile.active  { border-color: rgba(0,170,255,.4); box-shadow: 0 0 14px rgba(0,170,255,.2); }
+.group-tile.active:hover  { transform: translateY(-3px); }
+.group-tile.locked  { opacity: .35; }
+
+.group-tile-chars {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: .25rem;
+  line-height: 1.2;
+  letter-spacing: .04em;
+}
+.group-tile-label {
+  font-size: .62rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  margin-bottom: .3rem;
+}
+.group-tile-pct {
+  font-size: .78rem;
+  font-weight: 700;
+}
+.pct-green  { color: var(--accent-ok); }
+.pct-blue   { color: var(--accent-1); }
+.pct-dim    { color: var(--text-dim); }
+
+/* group mini progress bar */
+.mini-bar {
+  height: 3px;
+  background: rgba(255,255,255,.07);
+  border-radius: 100px;
+  margin-top: .35rem;
+  overflow: hidden;
+}
+.mini-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--accent-3), var(--accent-1));
+  transition: width .6s ease;
+}
+.mini-fill.done { background: var(--accent-ok); }
+{% elif user.active_days_this_month
+자모
+📊 Jamo
+안녕하세요, {{ user.name.split(' ')[0] }}님! 👋
+Hai già studiato in passato?
+🌱 Imparate oggi
+▶ Gruppo corrente:
+{% else %}
+Nessuna carta introdotta oggi
+{% if progress.syllable.unlocked %}
+{% if user.active_days_this_month
+{% if learn_count > 0 %}
+/ {{ ts.target_daily_minutes }} min
+Pronti per studiare il coreano?
+{% set current_group = progress.current_learn %}
+      {% for g in progress.jamo.groups %}
+        {% set is_current = current_group and current_group.phase == 'jamo' and current_group.group == g.group %}
+        {% set tile_class = 'complete' if g.complete else ('active' if is_current else 'locked') %}
+{% if g.complete %}✅{% elif is_current %}{{ g.pct_learned }}%{% else %}🔒{% endif %}
+{% set JAMO_CHARS = {
+    'vowels':     'ㅏ ㅑ ㅓ ㅕ ㅗ ㅛ ㅜ ㅠ ㅡ ㅣ',
+    'consonants': 'ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ',
+  } %}
+  {% set SYLLABLE_CHARS = {
+    'basic':    '가 나 다 라 마 바 사 아 자',
+    'advanced': '고 구 기 노 도 모 소 시 미',
+  } %}
+🪷 Zen
+🌱 Impara
+Inizia il Test
+⚙️
+
+--- app/templates/settings.html ---
+/**
+   * Compute a percentage fill for the track gradient.
+   * @param {HTMLInputElement} input
+   */
+  function computeFillPct(input) {
+    const min  = parseFloat(input.min)  || 0;
+    const max  = parseFloat(input.max)  || 100;
+    const val  = parseFloat(input.value);
+    return ((val - min) / (max - min)) * 100;
+  }
+
+  /**
+   * Update the display label and track fill on range change.
+   * @param {HTMLInputElement} input   - The range element
+   * @param {string}           labelId - ID of the value display element
+   * @param {string}           unit    - Unit suffix ("min" | "carte")
+   * @param {number[]}         presets - List of preset values to sync active state
+   */
+  function updateRange(input, labelId, unit, presets) {
+    const val = parseFloat(input.value);
+    const pct = computeFillPct(input);
+
+    // Update track fill
+    input.style.setProperty('--fill-pct', pct + '%');
+
+    // Update ARIA
+    input.setAttribute('aria-valuenow', val);
+
+    // Update display badge
+    const label = document.getElementById(labelId);
+    if (label) {
+      label.textContent = val + ' ' + unit;
+    }
+
+    // Sync preset button active states
+    syncPresets(input.id, val, presets);
+  }
+
+  /**
+   * Sync which preset button appears active.
+   * @param {string}   inputId - ID of the range input
+   * @param {number}   val     - Current value
+   * @param {number[]} presets - List of preset values
+   */
+  function syncPresets(inputId, val, presets) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const fieldRow = input.closest('.field-row');
+    if (!fieldRow) return;
+    const btns = fieldRow.querySelectorAll('.preset-btn');
+    btns.forEach(btn => {
+      const btnVal = parseFloat(btn.getAttribute('data-val'));
+      btn.classList.toggle('active', btnVal === val);
+    });
+  }
+
+  /**
+   * Click on a preset button: update range + display.
+   * @param {string}   inputId - ID of the range input
+   * @param {number}   value   - Value to set
+   * @param {string}   labelId - ID of the display label
+   * @param {string}   unit    - Unit suffix
+   * @param {number[]} presets - List of preset values
+   */
+  function setPreset(inputId, value, labelId, unit, presets) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.value = value;
+    updateRange(input, labelId, unit, presets);
+  }
+
+  /**
+   * Initialise range fills and preset active states on page load.
+   */
+  function initRanges() {
+    const configs = [
+      { inputId: 'range-minutes', labelId: 'display-minutes', unit: 'min',   presets: [10, 15, 20, 30] },
+      { inputId: 'range-cards',   labelId: 'display-cards',   unit: 'carte', presets: [3, 5, 8, 10]    },
+    ];
+
+    configs.forEach(({ inputId, labelId, unit, presets }) => {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      input.style.setProperty('--fill-pct', computeFillPct(input) + '%');
+      syncPresets(inputId, parseFloat(input.value), presets);
+    });
+  }
+
+  /**
+   * Auto-dismiss the success toast after 4 s.
+   */
+  function initToast() {
+    const toast = document.querySelector('.toast-success');
+    if (!toast) return;
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-8px)';
+      setTimeout(() => toast.remove(), 500);
+    }, 4000);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initRanges();
+    initToast();
+  });
+{% endblock %}
+
+{% block content %}
+{% endif %}
+: reindirizza automaticamente alla Zen Mode.
+Personalizza il tuo percorso di apprendimento
+{% for val in [3, 5, 8, 10] %}
+{% for val in [10, 15, 20, 30] %}
+{% endfor %}
+Riposizionamento (Test)
+Disconnetti
+attivato
+(consigliato): raggiunti gli obiettivi,
+                  l'app mostra un avviso gentile ma ti permette di continuare.
+                  Quando
+👤 Profilo
+⚙️ Impostazioni
+Nuove carte al giorno
+Hai imparato nuovi caratteri fuori dall'app (es. leggendo manhwa)? 
+          Puoi ripetere il test per sbloccare i livelli corrispondenti saltando le lezioni base.
+Impostazioni salvate!
+🧠 Modalità di studio
+/* ── Page layout ─────────────────────────────────────────── */
+  .settings-page {
+    padding: 2rem 0 4rem;
+  }
+
+  .settings-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .settings-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.4rem;
+  }
+
+  .settings-header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  /* ── Success toast ────────────────────────────────────────── */
+  .toast-success {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, rgba(94, 231, 223, 0.18), rgba(94, 231, 223, 0.08));
+    border: 1px solid rgba(94, 231, 223, 0.4);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.2rem;
+    margin-bottom: 2rem;
+    color: #5ee7df;
+    font-weight: 600;
+    font-size: 0.95rem;
+    animation: slideDown 0.35s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Section cards ────────────────────────────────────────── */
+  .settings-section {
+    margin-bottom: 1.75rem;
+  }
+
+  .settings-card {
+    border-left: 3px solid var(--accent-1);
+    padding: 1.75rem 1.75rem 1.5rem;
+    border-radius: var(--radius-md);
+  }
+
+  .settings-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Field rows ───────────────────────────────────────────── */
+  .field-row {
+    margin-bottom: 1.75rem;
+  }
+
+  .field-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.85rem;
+  }
+
+  /* ── Range inputs ─────────────────────────────────────────── */
+  .range-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 6px;
+    border-radius: 99px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(
+      to right,
+      var(--accent-1) 0%,
+      var(--accent-1) var(--fill-pct, 50%),
+      rgba(255,255,255,0.12) var(--fill-pct, 50%),
+      rgba(255,255,255,0.12) 100%
+    );
+    transition: background 0.15s ease;
+  }
+
+  .range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent-1);
+    box-shadow: 0 0 0 3px rgba(180, 111, 255, 0.3), 0 2px 8px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .range-input::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 5px rgba(180, 111, 255, 0.25), 0 2px 10px rgba(0,0,0,0.5);
+  }
+
+  .range-input::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent-1);
+    box-shadow: 0 0 0 3px rgba(180, 111, 255, 0.3);
+    cursor: pointer;
+  }
+
+  .range-value {
+    min-width: 70px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--accent-1);
+    background: rgba(180, 111, 255, 0.12);
+    border: 1px solid rgba(180, 111, 255, 0.3);
+    border-radius: 8px;
+    padding: 0.3rem 0.65rem;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  /* ── Preset buttons ───────────────────────────────────────── */
+  .preset-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .preset-btn {
+    padding: 0.35rem 0.9rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+    background: rgba(180, 111, 255, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .preset-btn.active {
+    border-color: var(--accent-1);
+    background: rgba(180, 111, 255, 0.2);
+    color: var(--accent-1);
+  }
+
+  /* ── Divider between fields ───────────────────────────────── */
+  .field-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.75rem 0;
+    opacity: 0.5;
+  }
+
+  /* ── iOS toggle switch ────────────────────────────────────── */
+  .toggle-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .toggle-label-group {
+    flex: 1;
+  }
+
+  .toggle-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+  }
+
+  .toggle-description {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .toggle-track::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .toggle-switch input:checked + .toggle-track {
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+    box-shadow: 0 0 12px rgba(94, 231, 223, 0.35);
+  }
+
+  .toggle-switch input:checked + .toggle-track::before {
+    transform: translateY(-50%) translateX(24px);
+  }
+
+  .toggle-switch input:focus + .toggle-track {
+    outline: 2px solid var(--accent-1);
+    outline-offset: 2px;
+  }
+
+  /* ── Profile section ──────────────────────────────────────── */
+  .profile-row {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+
+  .profile-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-1);
+    box-shadow: 0 0 0 4px rgba(180, 111, 255, 0.15);
+    flex-shrink: 0;
+  }
+
+  .profile-avatar-fallback {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    border: 2px solid rgba(180, 111, 255, 0.5);
+  }
+
+  .profile-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .profile-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .profile-email {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Form actions ─────────────────────────────────────────── */
+  .form-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn-full {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+  }
+
+  /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 540px) {
+    .settings-header h1 {
+      font-size: 1.6rem;
+    }
+
+    .settings-card {
+      padding: 1.25rem 1.1rem 1.1rem;
+    }
+
+    .profile-row {
+      flex-wrap: wrap;
+    }
+  }
+{% if user.picture %}
+Minuti di studio al giorno
+disattivato
+{% else %}
+{% endif %}
+
+    {# ── Main form ─────────────────────────────────────────── #}
+🧠 Fai il Test di Posizionamento
+Quando
+← Dashboard
+💾 Salva Impostazioni
+🎯 Obiettivi giornalieri
+Blocco rigido al limite
+
+--- app/templates/review_done.html ---
+Non hai altre carte da ripassare oggi. Ottimo lavoro!
+🪷 Zen Mode
+Ripasso completato!
+← Dashboard
+🌱 Impara
+
+--- app/templates/zen_mode.html ---
+{% endblock %}
+
+{% block content %}
+// Speech synthesis helper (used by zen_word_result.html partial)
+function speakKorean(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang  = 'ko-KR';
+  utt.rate  = 0.85;
+  utt.pitch = 1.0;
+  setTimeout(() => {
+    window.speechSynthesis.speak(utt);
+  }, 100);
+}
+Zen Mode
+{% if card.romanji %}
+{% endif %}
+{% if first_word %}
+      {% with word=first_word %}
+        {% include "zen_word_puzzle.html" %}
+      {% endwith %}
+    {% else %}
+su {{ ts.target_daily_minutes }} min
+Decodifica Parole 🔍
+{% if ts.over_hard %}
+Hai
+{% for card in cards %}
+{% if cards %}
+{% endfor %}
+🌱 Vai a Impara
+Impara almeno qualche Jamo per sbloccare le parole da decodificare!
+Riposati, decodifica parole e osserva i caratteri che già conosci.
+{% if word_count > 0 %}
+📚 Ripassa
+.zen-bg { background: radial-gradient(ellipse at top, rgba(0,170,255,.05) 0%, transparent 60%); }
+.zen-divider {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 2.5rem 0; color: var(--text-dim); font-size: .75rem;
+  text-transform: uppercase; letter-spacing: .1em;
+}
+.zen-divider::before, .zen-divider::after {
+  content:''; flex:1; height:1px; background: var(--border);
+}
+🛑 Hai raggiunto i {{ ts.target_daily_minutes }} minuti oggi. Ottimo lavoro! Riprendi domani.
+{% endblock %}
+
+{% block scripts %}
+@keyframes fadeSlideIn {
+  from { opacity:0; transform: translateY(10px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+{% if not ts.over_hard %}
+⏱️ Oggi:
+I tuoi caratteri 🎴
+← Dashboard
+🌱 Impara
+Nessuna pressione, nessun punteggio.
+
+--- app/templates/review_start.html ---
+o il pulsante
+{% endblock %}
+
+{% block content %}
+Invio
+Digita la Romaja (es:
+Zen Mode
+🚀 Inizia Ripasso
+❌ Sbagliato → viene mostrata la risposta giusta.
+Guarda il carattere
+✅ Corretto → si avanza automaticamente.
+Verifica
+na
+Viene mostrato un Jamo o una sillaba coreana.
+) e premi
+Scrivi la lettura
+Come funziona
+Vedi il risultato
+Perfetto
+Verifica / Avanti
+Faticoso
+.start-card {
+  max-width: 520px;
+  margin: 3rem auto;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-glow);
+}
+.how-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.step-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+  font-size: .85rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-body strong { display:block; font-size:.92rem; margin-bottom:.15rem; }
+.step-body span   { font-size:.82rem; color: var(--text-muted); }
+.kbd {
+  display: inline-block;
+  background: rgba(255,255,255,.1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: .05rem .35rem;
+  font-size: .75rem;
+  font-family: monospace;
+  color: var(--text-muted);
+}
+Algoritmo SRS
+Per niente
+ga
+Pronto per il Ripasso?
+carte da ripassare
+        (max 25 al giorno).
+← Torna
+eo
+Le carte che sbagli tornano prima, quelle facili spariscono per giorni.
+                Il limite è 20 min/giorno — poi vai in
+Oggi hai
+⌨️ Scorciatoie tastiera
+Quasi bene
+
+--- app/templates/learn_home.html ---
+🪷 Zen Mode
+{% endblock %}
+
+{% block content %}
+{% endif %}
+
+  {% else %}
+Appresi
+{% endif %}
+{% if current_group %}
+Torna domani per continuare!
+carte nuove
+2️⃣
+— la carta entra nel tuo sistema di ripasso SRS
+🚀 Inizia Sessione
+Già introdotte oggi: {{ new_today }}/{{ max_new }}
+{% if new_today >= max_new %}
+✅ Hai già introdotto {{ new_today }} nuove carte oggi (limite: {{ max_new }}).
+{% endfor %}
+{% elif learn_cards | length == 0 %}
+Sessione di oggi
+Hai completato Jamo e Sillabe. Continua con il ripasso SRS.
+{% if current_group.phase == 'jamo' and current_group.group == 'vowels' %}
+        {% set chars_list = ['ㅏ','ㅑ','ㅓ','ㅕ','ㅗ','ㅛ','ㅜ','ㅠ','ㅡ','ㅣ'] %}
+        {% set roms_list  = ['a','ya','eo','yeo','o','yo','u','yu','eu','i'] %}
+      {% elif current_group.phase == 'jamo' and current_group.group == 'consonants' %}
+        {% set chars_list = ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'] %}
+        {% set roms_list  = ['g','n','d','r','m','b','s','ng','j','ch','k','t','p','h'] %}
+      {% elif current_group.phase == 'syllable' and current_group.group == 'basic' %}
+        {% set chars_list = ['가','나','다','라','마','바','사','아','자','차','카','타','파','하'] %}
+        {% set roms_list  = ['ga','na','da','ra','ma','ba','sa','a','ja','cha','ka','ta','pa','ha'] %}
+      {% elif current_group.phase == 'syllable' and current_group.group == 'advanced' %}
+        {% set chars_list = ['고','구','기','노','누','니','도','두','모','무','미','보','소','시'] %}
+        {% set roms_list  = ['go','gu','gi','no','nu','ni','do','du','mo','mu','mi','bo','so','si'] %}
+      {% else %}
+        {% set chars_list = [] %}
+        {% set roms_list  = [] %}
+      {% endif %}
+      {% for i in range(chars_list|length) %}
+Quiz
+📚 Ripassa
+3️⃣
+— vedi il Jamo/sillaba con lettura e nota mnemonica (4 sec)
+🎉 Tutte le carte di questo gruppo sono state introdotte! Continua con il ripasso.
+1️⃣
+📚 Ripassa ora
+ℹ️ Come funziona la sessione
+Introduzione guidata di nuovi caratteri, gruppo per gruppo.
+{% else %}
+Studia
+.learn-hero {
+  background: linear-gradient(135deg, rgba(0,170,255,.12), rgba(255,79,94,.08));
+  border: 1px solid rgba(0,170,255,.25);
+  border-radius: var(--radius-xl);
+  padding: 2rem 2rem 1.6rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 40px rgba(0,170,255,.15);
+}
+.group-intro-chars {
+  display: flex;
+  gap: .8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 1rem 0;
+}
+.intro-char {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: .8rem .6rem;
+  min-width: 60px;
+  transition: border-color .2s, transform .2s;
+}
+.intro-char:hover { border-color: var(--accent-1); transform: translateY(-3px); }
+.intro-char .kr  { font-family: 'Noto Sans KR', sans-serif; font-size: 2rem; color: var(--accent-1); }
+.intro-char .rom { font-size: .72rem; color: var(--text-muted); margin-top: .2rem; }
+20 min max
+🌱 Modalità Impara
+— scrivi la romanizzazione (Romaja) per verificare
+← Dashboard
+Tutti i caratteri appresi!
+🪷 Zen
+Avanza
+
+--- app/templates/review.html ---
+Quanto ti è venuto naturale?
+⏸️
+{% endblock %}
+
+{% block content %}
+⚡ Hai superato i 15 minuti! Finisci questo ripasso o
+Zen Mode
+{% if card.romanji %}
+{% endif %}
+🌟 Perfetto!
+😓 Faticoso
+📚 Sessione di Ripasso
+Sessione in pausa — torna per riprendere
+Verifica →
+const CORRECT_ANSWER  = {{ card.back | tojson }};
+
+// ── Audio Helper ──────────────────────────────────────────────
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'ko-KR';
+  utt.rate = 0.85;
+  setTimeout(() => window.speechSynthesis.speak(utt), 100);
+}
+
+// Auto-play on load
+speakText('{{ card.front }}');
+const CORRECT_ROMANJI = {{ (card.romanji or '') | tojson }};
+
+let _cardStart   = Date.now();
+let _answered    = false;
+let _wasCorrect  = false;
+let _pauseStart  = null;
+
+function showPause() {
+  document.getElementById('pause-overlay').classList.add('visible');
+  _pauseStart = Date.now();
+}
+function hidePause() {
+  document.getElementById('pause-overlay').classList.remove('visible');
+  if (_pauseStart !== null) {
+    _cardStart += (Date.now() - _pauseStart);
+    _pauseStart = null;
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  document.hidden ? showPause() : hidePause();
+});
+window.addEventListener('blur', showPause);
+window.addEventListener('focus', hidePause);
+
+function normalise(s) {
+  return s.trim().toLowerCase().replace(/\s+/g, '');
+}
+
+function isMatch(input) {
+  const n = normalise(input);
+  if (!n) return false;
+  const targets = [];
+  
+  if (CORRECT_ANSWER) {
+    targets.push(normalise(CORRECT_ANSWER));
+    if (CORRECT_ANSWER.includes('/')) {
+      CORRECT_ANSWER.split('/').forEach(t => targets.push(normalise(t)));
+    }
+  }
+  
+  if (CORRECT_ROMANJI) {
+    targets.push(normalise(CORRECT_ROMANJI));
+    if (CORRECT_ROMANJI.includes('/')) {
+      CORRECT_ROMANJI.split('/').forEach(t => targets.push(normalise(t)));
+    }
+  }
+  
+  return targets.includes(n);
+}
+
+function checkAnswer() {
+  if (_answered) { submitQuality(_wasCorrect ? 5 : 0); return; }
+
+  const input = document.getElementById('answer-input').value;
+  if (!input.trim()) { document.getElementById('answer-input').focus(); return; }
+
+  _answered   = true;
+  _wasCorrect = isMatch(input);
+
+  const inp = document.getElementById('answer-input');
+  inp.disabled = true;
+  inp.classList.add(_wasCorrect ? 'correct' : 'wrong');
+
+  document.getElementById('answer-reveal').style.display = 'block';
+
+  const panel = document.getElementById('feedback-panel');
+  const ftxt  = document.getElementById('feedback-text');
+  const fhint = document.getElementById('feedback-hint');
+  panel.style.display = 'block';
+
+  if (_wasCorrect) {
+    panel.className = 'ok';
+    ftxt.textContent = '✅ Corretto!';
+    fhint.textContent = CORRECT_ANSWER + (CORRECT_ROMANJI ? ' — ' + CORRECT_ROMANJI : '');
+    setTimeout(() => { if (_wasCorrect) submitQuality(5); }, 1200);
+  } else {
+    panel.className = 'bad';
+    ftxt.textContent = '❌ Risposta: ' + CORRECT_ANSWER;
+    fhint.textContent = (CORRECT_ROMANJI ? CORRECT_ROMANJI + ' — ' : '') + 'Hai scritto: "' + input + '"';
+  }
+
+  document.getElementById('quality-row').style.display = 'block';
+
+  const btn = document.getElementById('check-btn');
+  btn.textContent = '→ Avanti';
+}
+
+function submitQuality(q) {
+  if (!_wasCorrect && q > 2) q = 1;
+  const elapsed = Date.now() - _cardStart - (_pauseStart ? Date.now() - _pauseStart : 0);
+  document.getElementById('quality-input').value = q;
+  document.getElementById('time-ms-input').value = elapsed;
+  document.getElementById('review-form').submit();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (!_answered) {
+    if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
+  } else {
+    if (e.key === 'Enter') { e.preventDefault(); submitQuality(_wasCorrect ? 5 : 1); }
+    if (e.key === '1') submitQuality(0);
+    if (e.key === '2') submitQuality(1);
+    if (e.key === '3') submitQuality(3);
+    if (e.key === '4') submitQuality(5);
+  }
+});
+
+document.getElementById('answer-input').focus();
+/* ── Input answer ─────────────────────────────────────────── */
+.answer-area { max-width: 460px; margin: 1.5rem auto 0; }
+.answer-input-wrap { position: relative; display: flex; align-items: center; gap: .6rem; }
+#answer-input {
+  width: 100%; padding: .85rem 1.2rem; border-radius: var(--radius-md);
+  background: rgba(255,255,255,.06); border: 2px solid var(--border);
+  color: var(--text-primary); font-size: 1.35rem;
+  font-family: 'Noto Sans KR', 'Inter', sans-serif;
+  text-align: center; outline: none;
+  transition: border-color .2s, box-shadow .2s; letter-spacing: .08em;
+}
+#answer-input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,170,255,.18); }
+#answer-input.correct { border-color: var(--accent-ok); box-shadow: 0 0 0 3px rgba(94,231,160,.2); background: rgba(94,231,160,.07); }
+#answer-input.wrong { border-color: var(--accent-bad); box-shadow: 0 0 0 3px rgba(255,107,107,.2); background: rgba(255,107,107,.07); animation: shake .35s ease; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  60%{transform:translateX(8px)}
+  80%{transform:translateX(-4px)}
+}
+.submit-btn {
+  padding: .85rem 1.4rem; border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  color: #fff; border: none; font-weight: 700; font-size: 1rem;
+  cursor: pointer; white-space: nowrap;
+  transition: transform .15s, box-shadow .15s; flex-shrink: 0;
+}
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,170,255,.4); }
+
+#feedback-panel {
+  display: none; margin-top: 1rem; padding: 1rem 1.2rem;
+  border-radius: var(--radius-md); text-align: center; animation: fadeIn .25s ease;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+#feedback-panel.ok  { background: rgba(94,231,160,.1); border:1px solid rgba(94,231,160,.3); color: var(--accent-ok); }
+#feedback-panel.bad { background: rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3); color: var(--accent-bad); }
+.feedback-correct { font-size: 1.2rem; font-weight:700; margin-bottom:.3rem; }
+.feedback-hint    { font-size: .85rem; opacity:.85; }
+
+#quality-row { display: none; margin-top: 1rem; }
+
+#pause-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(13,13,20,.88); backdrop-filter: blur(10px);
+  z-index: 200; align-items: center; justify-content: center;
+  flex-direction: column; gap: 1rem;
+}
+#pause-overlay.visible { display: flex; }
+.pause-icon { font-size: 3.5rem; }
+.pause-text { font-size: 1.1rem; color: var(--text-muted); }
+{% if over_soft %}
+{% endblock %}
+
+{% block scripts %}
+❌ Per niente
+← Dashboard
+🙂 Quasi bene
+
+--- app/templates/zen_word_result.html ---
+{% else %}
+🔊 Ascolta
+💡 Risposta mostrata — nessuna penalità
+{% elif is_correct %}
+✅ Corretto! Ottimo!
+{% if has_next %}
+Prossima parola →
+🎉 Hai visto tutte le parole disponibili!
+{% endif %}
+{% if is_correct is none %}
+🇮🇹 {{ word.m }}
+❌ Hai scritto:
+
+--- app/templates/learn_card.html ---
+{% endblock %}
+
+{% block content %}
+Verifica &rarr;
+{% if card.notes %}
+{% if card.romanji %}
+{% endif %}
+Ho capito &rarr; Quiz &nbsp;
+Spazio
+Avanti &rarr; &nbsp;
+Enter
+Avanzamento automatico tra 4 secondi&hellip;
+{% endif %}
+    {% if uc.fast_lane %}
+Sessione in pausa — torna per riprendere
+&#x23F8;&#xFE0F;
+&#x1F4A1;
+Progresso sessione
+{% endblock %}
+
+{% block scripts %}
+Come si legge questo carattere? (Romaja)
+/* ── Page layout ──────────────────────────────────────────── */
+.learn-wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
+}
+
+/* ── Header row ───────────────────────────────────────────── */
+.learn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+  gap: .8rem;
+}
+.learn-header-left h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 .15rem;
+}
+.learn-header-left p {
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.learn-time-row {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.learn-time-val {
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+
+/* ── Session progress bar (remaining cards) ───────────────── */
+.session-progress-wrap {
+  margin-bottom: 1.4rem;
+}
+.session-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: .72rem;
+  color: var(--text-dim);
+  margin-bottom: .35rem;
+}
+
+/* ── Phase badge ──────────────────────────────────────────── */
+.phase-badge {
+  display: inline-block;
+  background: rgba(0,170,255,.15);
+  border: 1px solid rgba(0,170,255,.3);
+  border-radius: 100px;
+  font-size: .72rem;
+  padding: .3rem .9rem;
+  color: var(--accent-1);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: .9rem;
+}
+.group-badge {
+  display: inline-block;
+  background: rgba(94,231,223,.12);
+  border: 1px solid rgba(94,231,223,.25);
+  border-radius: 100px;
+  font-size: .68rem;
+  padding: .25rem .75rem;
+  color: var(--accent-3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-left: .5rem;
+}
+
+/* ── Flashcard container ──────────────────────────────────── */
+.learn-card {
+  background: linear-gradient(135deg, rgba(0,170,255,.15), rgba(255,79,94,.10));
+  border: 1px solid rgba(0,170,255,.35);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 0 40px rgba(0,170,255,.18), 0 8px 32px rgba(0,0,0,.3);
+  padding: 2.2rem 2rem 1.8rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow .3s;
+}
+.learn-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 60% 20%, rgba(0,170,255,.08), transparent 65%);
+  pointer-events: none;
+}
+
+/* ── Main character display ───────────────────────────────── */
+.card-char-study {
+  font-family: 'Noto Sans KR', 'Inter', sans-serif;
+  font-size: 6.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: .4rem;
+  user-select: none;
+}
+.card-char-quiz {
+  font-family: 'Noto Sans KR', 'Inter', sans-serif;
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.1;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: .6rem;
+  user-select: none;
+}
+
+/* ── Study phase: reading & romanji ──────────────────────── */
+.study-reading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-3);
+  font-family: 'Noto Sans KR', 'Inter', sans-serif;
+  margin-bottom: .25rem;
+  letter-spacing: .04em;
+}
+.study-romanji {
+  font-size: 1rem;
+  color: var(--text-muted);
+  letter-spacing: .06em;
+  margin-bottom: 1.2rem;
+}
+
+/* ── Mnemonic / notes box ─────────────────────────────────── */
+.mnemonic-box {
+  background: rgba(255,190,85,.1);
+  border: 1px solid rgba(255,190,85,.25);
+  border-radius: 10px;
+  padding: .8rem 1rem;
+  text-align: left;
+  font-size: .88rem;
+  color: var(--text-primary);
+  display: flex;
+  gap: .6rem;
+  align-items: flex-start;
+  margin-top: .6rem;
+}
+.mnemonic-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+.mnemonic-text { line-height: 1.55; }
+
+/* ── Countdown bar ────────────────────────────────────────── */
+.countdown-wrap { margin-top: 1.4rem; position: relative; }
+.countdown-track { height: 4px; background: rgba(255,255,255,.08); border-radius: 100px; overflow: hidden; }
+.countdown-fill {
+  height: 100%; width: 100%;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  border-radius: 100px;
+  animation: countdown 4s linear forwards;
+}
+@keyframes countdown { from { width: 100%; } to { width: 0%; } }
+.countdown-label { font-size: .68rem; color: var(--text-dim); text-align: center; margin-top: .4rem; }
+
+/* ── "Skip to quiz" button ────────────────────────────────── */
+.skip-btn {
+  margin-top: 1rem; width: 100%; padding: .75rem 1rem;
+  border-radius: var(--radius-md); background: rgba(255,255,255,.06);
+  border: 1px solid var(--border); color: var(--text-muted);
+  font-size: .88rem; cursor: pointer;
+  transition: background .2s, color .2s, border-color .2s;
+  font-family: 'Inter', sans-serif;
+}
+.skip-btn:hover { background: rgba(0,170,255,.12); border-color: rgba(0,170,255,.4); color: var(--accent-1); }
+.skip-btn kbd {
+  display: inline-block; background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15); border-radius: 4px;
+  padding: .05rem .35rem; font-size: .75rem; margin: 0 .15rem;
+}
+
+/* ── Quiz phase ───────────────────────────────────────────── */
+#quiz-phase { display: none; }
+
+/* ── Quiz input ───────────────────────────────────────────── */
+.quiz-input-wrap {
+  display: flex; align-items: center; gap: .6rem;
+  max-width: 460px; margin: 1.2rem auto 0;
+}
+#quiz-input {
+  width: 100%; padding: .85rem 1.2rem;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,.06);
+  border: 2px solid var(--border);
+  color: var(--text-primary); font-size: 1.35rem;
+  font-family: 'Noto Sans KR', 'Inter', sans-serif;
+  text-align: center; outline: none;
+  transition: border-color .2s, box-shadow .2s; letter-spacing: .08em;
+}
+#quiz-input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,170,255,.18); }
+#quiz-input.correct { border-color: var(--accent-ok); box-shadow: 0 0 0 3px rgba(94,231,160,.2); background: rgba(94,231,160,.07); }
+#quiz-input.wrong { border-color: var(--accent-bad); box-shadow: 0 0 0 3px rgba(255,107,107,.2); background: rgba(255,107,107,.07); animation: shake .35s ease; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  60%      { transform: translateX(8px); }
+  80%      { transform: translateX(-4px); }
+}
+.quiz-submit-btn {
+  padding: .85rem 1.4rem; border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  color: #fff; border: none; font-weight: 700; font-size: 1rem;
+  cursor: pointer; white-space: nowrap;
+  transition: transform .15s, box-shadow .15s; flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+}
+.quiz-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,170,255,.4); }
+
+/* ── Feedback panel ───────────────────────────────────────── */
+#feedback-panel {
+  display: none; max-width: 460px; margin: 1rem auto 0;
+  padding: 1rem 1.2rem; border-radius: var(--radius-md);
+  text-align: center; animation: fadeIn .25s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+#feedback-panel.ok  { background: rgba(94,231,160,.1); border: 1px solid rgba(94,231,160,.3); color: var(--accent-ok); }
+#feedback-panel.bad { background: rgba(255,107,107,.1); border: 1px solid rgba(255,107,107,.3); color: var(--accent-bad); }
+.feedback-main { font-size: 1.15rem; font-weight: 700; margin-bottom: .3rem; }
+.feedback-sub  { font-size: .85rem; opacity: .85; }
+
+/* ── "Continue anyway" button (shown on wrong answer) ─────── */
+#continue-btn {
+  display: none; max-width: 460px; margin: .8rem auto 0; width: 100%;
+  padding: .75rem 1.2rem; border-radius: var(--radius-md);
+  background: rgba(255,255,255,.06); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: .9rem; cursor: pointer;
+  transition: background .2s, color .2s; font-family: 'Inter', sans-serif;
+}
+#continue-btn:hover { background: rgba(255,107,107,.12); color: var(--accent-bad); }
+
+/* ── Hidden learn form ────────────────────────────────────── */
+#learn-form { display: none; }
+
+/* ── Pause overlay ────────────────────────────────────────── */
+#pause-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(13,13,20,.88); backdrop-filter: blur(10px);
+  z-index: 200; align-items: center; justify-content: center;
+  flex-direction: column; gap: 1rem;
+}
+#pause-overlay.visible { display: flex; }
+.pause-icon { font-size: 3.5rem; }
+.pause-text { font-size: 1.1rem; color: var(--text-muted); }
+⚡ Fast-Lane
+{% if card.group_name %}
+&larr; Dashboard
+&#x1F4D6; Studia il carattere
+// ================================================================
+//  Learn card page logic
+// ================================================================
+
+const CORRECT_ANSWER  = {{ card.back | tojson }};
+const CORRECT_ROMANJI = {{ (card.romanji or '') | tojson }};
+
+let _cardStart  = Date.now();
+let _quizStart  = null;
+let _answered   = false;
+let _wasCorrect = false;
+let _autoTimer  = null;
+let _pauseStart = null;
+let _studyDone  = false;
+
+// ── Audio Helper ──────────────────────────────────────────────
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'ko-KR';
+  utt.rate = 0.85;
+  setTimeout(() => window.speechSynthesis.speak(utt), 100);
+}
+
+// ── Pause overlay ─────────────────────────────────────────────────
+function showPause() {
+  document.getElementById('pause-overlay').classList.add('visible');
+  _pauseStart = Date.now();
+  if (_autoTimer) { clearTimeout(_autoTimer); _autoTimer = null; }
+}
+function hidePause() {
+  document.getElementById('pause-overlay').classList.remove('visible');
+  if (_pauseStart !== null) {
+    const gap = Date.now() - _pauseStart;
+    _cardStart += gap;
+    if (_quizStart !== null) _quizStart += gap;
+    _pauseStart = null;
+  }
+  if (_studyDone && !_answered) {
+    const inp = document.getElementById('quiz-input');
+    if (inp) inp.focus();
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  document.hidden ? showPause() : hidePause();
+});
+window.addEventListener('blur',  showPause);
+window.addEventListener('focus', hidePause);
+
+// ── Normalise for comparison ──────────────────────────────────────
+function normalise(s) {
+  return s.trim().toLowerCase()
+    .replace(/\s+/g, '');
+}
+
+function isMatch(input) {
+  const n = normalise(input);
+  if (!n) return false;
+  const targets = [];
+  
+  if (CORRECT_ANSWER) {
+    targets.push(normalise(CORRECT_ANSWER));
+    if (CORRECT_ANSWER.includes('/')) {
+      CORRECT_ANSWER.split('/').forEach(t => targets.push(normalise(t)));
+    }
+  }
+  
+  if (CORRECT_ROMANJI) {
+    targets.push(normalise(CORRECT_ROMANJI));
+    if (CORRECT_ROMANJI.includes('/')) {
+      CORRECT_ROMANJI.split('/').forEach(t => targets.push(normalise(t)));
+    }
+  }
+  
+  return targets.includes(n);
+}
+
+// ── Switch from study to quiz ─────────────────────────────────────
+function startQuiz() {
+  if (_studyDone) return;
+  _studyDone = true;
+  if (_autoTimer) { clearTimeout(_autoTimer); _autoTimer = null; }
+
+  document.getElementById('study-phase').style.display = 'none';
+  document.getElementById('quiz-phase').style.display  = 'block';
+  
+  document.getElementById('quiz-input').focus();
+  speakText('{{ card.front }}'); // Auto-play when quiz starts
+
+  _quizStart = Date.now();
+
+  const inp = document.getElementById('quiz-input');
+  inp.focus();
+}
+
+{% if uc.fast_lane %}
+// Fast-lane: skip study phase immediately
+startQuiz();
+{% else %}
+// Auto-advance after 4 seconds during study phase
+_autoTimer = setTimeout(startQuiz, 4000);
+{% endif %}
+
+// ── Check answer ──────────────────────────────────────────────────
+function checkAnswer() {
+  if (_answered) return;
+
+  const inp = document.getElementById('quiz-input');
+  const val = inp.value;
+  if (!val.trim()) { inp.focus(); return; }
+
+  _answered   = true;
+  _wasCorrect = isMatch(val);
+
+  inp.disabled = true;
+  inp.classList.add(_wasCorrect ? 'correct' : 'wrong');
+  document.getElementById('verify-btn').disabled = true;
+
+  const panel = document.getElementById('feedback-panel');
+  const fMain = document.getElementById('feedback-main');
+  const fSub  = document.getElementById('feedback-sub');
+  panel.style.display = 'block';
+
+  if (_wasCorrect) {
+    panel.className    = 'ok';
+    fMain.textContent  = '\u2705 Corretto!';
+    fSub.textContent   = CORRECT_ANSWER + (CORRECT_ROMANJI ? ' \u2014 ' + CORRECT_ROMANJI : '');
+    // Auto-advance after 0.8s on correct
+    setTimeout(submitLearn, 800);
+  } else {
+    document.getElementById('fast_lane_failed').value = "true";
+    panel.className   = 'bad';
+    fMain.textContent = '\u274C Risposta: ' + CORRECT_ANSWER;
+    fSub.textContent  = (CORRECT_ROMANJI ? CORRECT_ROMANJI + ' \u2014 ' : '') + 'Hai scritto: "' + val + '"';
+    // Show continue button
+    document.getElementById('continue-btn').style.display = 'block';
+  }
+}
+
+// ── Submit learn result ────────────────────────────────────────────
+function submitLearn() {
+  const now     = Date.now();
+  const elapsed = now - (_quizStart || _cardStart) -
+                  (_pauseStart ? now - _pauseStart : 0);
+  document.getElementById('time-ms-input').value = elapsed;
+  document.getElementById('learn-form').submit();
+}
+
+// ── Keyboard shortcuts ─────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (!_studyDone) {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      startQuiz();
+    }
+    return;
+  }
+
+  if (!_answered) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      checkAnswer();
+    }
+    return;
+  }
+
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    submitLearn();
+  }
+});
+/ 20 min
+
+--- app/templates/login.html ---
+{% endif %}
+{% if error %}
+Giorni Attivi mensili – nessuna streak punitiva
+Limite guidato di 15-20 min/giorno
+{% endfor %}
+15 minuti al giorno per dominare l'Hangul.
+⏱️
+Zen Mode senza pressione
+SRS adattivo – Jamo, Sillabe, Vocaboli
+Un percorso gamificato, senza punizioni.
+⚠️ Accesso negato: {{ error }}
+Accedi con Google
+Accedendo accetti i termini di utilizzo. I dati sono archiviati localmente.
+{% for i in range(18) %}
+Impara il Coreano
+
+--- app/templates/learn_done.html ---
+{% if congratulate %}
+      Hai imparato tutti i caratteri di oggi. Il tuo cervello sta assorbendo il coreano!
+    {% elif over_limit %}
+      Hai raggiunto il limite di studio di oggi. Riposati: la memoria consolida mentre dormi.
+    {% else %}
+      Buon lavoro! Continua così per mantenere la serie.
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+Tempo studiato oggi
+Studiare troppo a lungo riduce l&rsquo;efficacia. Torna domani riposato per ottenere risultati migliori!
+    {% else %}
+{% endif %}
+&#x1F4DA; Inizia Ripasso
+{% if congratulate %}
+      Ottimo lavoro!
+    {% elif over_limit %}
+      Limite raggiunto!
+    {% else %}
+      Sessione completata!
+    {% endif %}
+{% elif ts.over_soft %}
+Continua così!
+{% if ts.over_hard %}
+Suggerimento:
+&#x1FAB7; Zen Mode
+{% endif %}
+      {% if ts.pct_hard >= 50 %}
+Sapevi che?
+{% if congratulate %}&#x1F389;{% elif over_limit %}&#x23F1;&#xFE0F;{% else %}&#x2705;{% endif %}
+&#x26A1; Limite massimo superato
+.done-wrap { max-width: 480px; margin: 0 auto; padding: 3.5rem 1rem 4rem; text-align: center; }
+.done-emoji { font-size: 5rem; line-height: 1; margin-bottom: 1.2rem; animation: popIn .45s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.done-title {
+  font-size: 2rem; font-weight: 700; margin: 0 0 .6rem;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.done-subtitle { font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin: 0 0 2.2rem; max-width: 360px; margin-left: auto; margin-right: auto; }
+.done-stats-card { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.8rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+.done-stats-label { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .09em; font-weight: 600; }
+.done-time-value { font-size: 3.2rem; font-weight: 700; color: var(--accent-1); line-height: 1; }
+.done-time-unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; margin-left: .2rem; }
+.done-progress-row { width: 100%; }
+.done-progress-meta { display: flex; justify-content: space-between; font-size: .72rem; color: var(--text-dim); margin-bottom: .4rem; }
+.done-badges { display: flex; gap: .7rem; flex-wrap: wrap; justify-content: center; }
+.done-badge { display: inline-flex; align-items: center; gap: .35rem; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 100px; font-size: .78rem; padding: .3rem .85rem; color: var(--text-muted); }
+.done-badge.ok   { border-color: rgba(94,231,160,.3); color: var(--accent-ok); background: rgba(94,231,160,.08); }
+.done-badge.warn { border-color: rgba(255,190,85,.3);  color: var(--accent-warn); background: rgba(255,190,85,.08); }
+.done-badge.info { border-color: rgba(94,231,223,.3);  color: var(--accent-3); background: rgba(94,231,223,.08); }
+.done-actions { display: flex; gap: .85rem; justify-content: center; flex-wrap: wrap; }
+.done-actions .btn { min-width: 140px; }
+.done-tip { margin-top: 2rem; padding: .9rem 1.1rem; border-radius: var(--radius-md); background: rgba(0,170,255,.07); border: 1px solid rgba(0,170,255,.18); font-size: .82rem; color: var(--text-muted); line-height: 1.55; }
+.done-tip strong { color: var(--accent-1); }
+&#x1F9E0; In corso &mdash; {{ 20 - ts.minutes_studied }} min al limite
+{% else %}
+{% if congratulate %}
+&larr; Dashboard
+min
+Progresso giornaliero
+La costanza quotidiana è il segreto per padroneggiare il coreano.
+    {% endif %}
+&#x23F0; Obiettivo 15 min raggiunto
+Fai il ripasso delle carte già studiate per rinforzare la memoria a lungo termine con l&rsquo;algoritmo SRS.
+    {% elif over_limit %}
+&#x1F525; Buona sessione

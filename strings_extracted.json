@@ -1,0 +1,982 @@
+{
+  "/* ── Soft-cap warning modal ──────────────────────────────── */\n  #softcap-modal {\n    display: none;\n    position: fixed;\n    inset: 0;\n    background: rgba(13,13,20,.82);\n    backdrop-filter: blur(12px);\n    z-index: 500;\n    align-items: center;\n    justify-content: center;\n  }\n  #softcap-modal.visible { display: flex; }\n  .softcap-card {\n    background: var(--bg-card);\n    border: 1px solid rgba(0,170,255,.35);\n    border-radius: var(--radius-xl);\n    padding: 2.2rem 2rem;\n    max-width: 420px;\n    width: 90%;\n    text-align: center;\n    box-shadow: 0 0 60px rgba(0,170,255,.25);\n    animation: popIn .35s cubic-bezier(.36,.07,.19,.97);\n  }\n  @keyframes popIn {\n    0%   { transform: scale(.85); opacity: 0; }\n    70%  { transform: scale(1.03); }\n    100% { transform: scale(1);   opacity: 1; }\n  }": {
+    "file": "base",
+    "text": "/* ── Soft-cap warning modal ──────────────────────────────── */\n  #softcap-modal {\n    display: none;\n    position: fixed;\n    inset: 0;\n    background: rgba(13,13,20,.82);\n    backdrop-filter: blur(12px);\n    z-index: 500;\n    align-items: center;\n    justify-content: center;\n  }\n  #softcap-modal.visible { display: flex; }\n  .softcap-card {\n    background: var(--bg-card);\n    border: 1px solid rgba(0,170,255,.35);\n    border-radius: var(--radius-xl);\n    padding: 2.2rem 2rem;\n    max-width: 420px;\n    width: 90%;\n    text-align: center;\n    box-shadow: 0 0 60px rgba(0,170,255,.25);\n    animation: popIn .35s cubic-bezier(.36,.07,.19,.97);\n  }\n  @keyframes popIn {\n    0%   { transform: scale(.85); opacity: 0; }\n    70%  { transform: scale(1.03); }\n    100% { transform: scale(1);   opacity: 1; }\n  }"
+  },
+  "한": {
+    "file": "base",
+    "text": "한"
+  },
+  "Korean": {
+    "file": "base",
+    "text": "Korean"
+  },
+  "🌱 Impara": {
+    "file": "base",
+    "text": "🌱 Impara"
+  },
+  "📚 Ripassa": {
+    "file": "base",
+    "text": "📚 Ripassa"
+  },
+  "🪷 Zen": {
+    "file": "base",
+    "text": "🪷 Zen"
+  },
+  "⚙️": {
+    "file": "base",
+    "text": "⚙️"
+  },
+  "Esci": {
+    "file": "base",
+    "text": "Esci"
+  },
+  "🎯": {
+    "file": "base",
+    "text": "🎯"
+  },
+  "Obiettivo del giorno raggiunto!": {
+    "file": "base",
+    "text": "Obiettivo del giorno raggiunto!"
+  },
+  "Il cervello impara meglio a piccole dosi. Hai già completato il tuo obiettivo di studio.\n        Vuoi passare alla Zen Mode per consolidare, o continuare comunque?": {
+    "file": "base",
+    "text": "Il cervello impara meglio a piccole dosi. Hai già completato il tuo obiettivo di studio.\n        Vuoi passare alla Zen Mode per consolidare, o continuare comunque?"
+  },
+  "🪷 Vai alla Zen Mode": {
+    "file": "base",
+    "text": "🪷 Vai alla Zen Mode"
+  },
+  "Continua comunque →": {
+    "file": "base",
+    "text": "Continua comunque →"
+  },
+  "Puoi cambiare il limite nelle": {
+    "file": "base",
+    "text": "Puoi cambiare il limite nelle"
+  },
+  "Impostazioni": {
+    "file": "base",
+    "text": "Impostazioni"
+  },
+  "// ── Study-time heartbeat (pauses when window loses focus) ────\n    {% if user is defined and user %}\n    let _lastSent       = Date.now();\n    let _softCapShown   = sessionStorage.getItem('softCapDismissed') === '1';\n    let _focused        = !document.hidden;\n\n    function _sendAccumulated() {\n      const now   = Date.now();\n      const delta = Math.round((now - _lastSent) / 1000);\n      _lastSent   = now;\n      if (delta": {
+    "file": "base",
+    "text": "// ── Study-time heartbeat (pauses when window loses focus) ────\n    {% if user is defined and user %}\n    let _lastSent       = Date.now();\n    let _softCapShown   = sessionStorage.getItem('softCapDismissed') === '1';\n    let _focused        = !document.hidden;\n\n    function _sendAccumulated() {\n      const now   = Date.now();\n      const delta = Math.round((now - _lastSent) / 1000);\n      _lastSent   = now;\n      if (delta"
+  },
+  "{\n      if (_focused) _sendAccumulated();\n    }, 10000);\n\n    function updateTimerUI(data) {\n      const fill = document.getElementById('time-fill');\n      const val  = document.getElementById('time-value');\n      if (!fill || !val) return;\n      fill.style.width = (data.pct_target || data.pct_hard) + '%';\n      fill.className   = 'progress-fill' +\n        (data.over_target ? ' full' : data.over_soft ? ' warn' : '');\n      val.textContent  = data.minutes_studied + ' min';\n    }\n    {% endif %}": {
+    "file": "base",
+    "text": "{\n      if (_focused) _sendAccumulated();\n    }, 10000);\n\n    function updateTimerUI(data) {\n      const fill = document.getElementById('time-fill');\n      const val  = document.getElementById('time-value');\n      if (!fill || !val) return;\n      fill.style.width = (data.pct_target || data.pct_hard) + '%';\n      fill.className   = 'progress-fill' +\n        (data.over_target ? ' full' : data.over_soft ? ' warn' : '');\n      val.textContent  = data.minutes_studied + ' min';\n    }\n    {% endif %}"
+  },
+  ".test-card {\n  max-width: 500px;\n  margin: 3rem auto;\n  background: var(--bg-glass);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-xl);\n  padding: 2.5rem 2rem;\n  box-shadow: var(--shadow-glow);\n  text-align: center;\n}\n.char-display {\n  font-size: 5rem;\n  font-weight: 700;\n  color: var(--text-primary);\n  margin-bottom: 1rem;\n}\n.quiz-input {\n  width: 100%;\n  padding: 1rem;\n  font-size: 1.2rem;\n  text-align: center;\n  border-radius: var(--radius-md);\n  border: 1px solid var(--border);\n  background: rgba(0,0,0,0.2);\n  color: var(--text-primary);\n  margin-bottom: 1rem;\n}\n.quiz-input:focus { outline: none; border-color: var(--accent-1); }": {
+    "file": "placement",
+    "text": ".test-card {\n  max-width: 500px;\n  margin: 3rem auto;\n  background: var(--bg-glass);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-xl);\n  padding: 2.5rem 2rem;\n  box-shadow: var(--shadow-glow);\n  text-align: center;\n}\n.char-display {\n  font-size: 5rem;\n  font-weight: 700;\n  color: var(--text-primary);\n  margin-bottom: 1rem;\n}\n.quiz-input {\n  width: 100%;\n  padding: 1rem;\n  font-size: 1.2rem;\n  text-align: center;\n  border-radius: var(--radius-md);\n  border: 1px solid var(--border);\n  background: rgba(0,0,0,0.2);\n  color: var(--text-primary);\n  margin-bottom: 1rem;\n}\n.quiz-input:focus { outline: none; border-color: var(--accent-1); }"
+  },
+  "Preparazione...": {
+    "file": "placement",
+    "text": "Preparazione..."
+  },
+  "⏳": {
+    "file": "placement",
+    "text": "⏳"
+  },
+  "Non lo so": {
+    "file": "placement",
+    "text": "Non lo so"
+  },
+  "Conferma": {
+    "file": "placement",
+    "text": "Conferma"
+  },
+  "Valutazione Completata": {
+    "file": "placement",
+    "text": "Valutazione Completata"
+  },
+  "Attiva Fast-Lane e Inizia 🚀": {
+    "file": "placement",
+    "text": "Attiva Fast-Lane e Inizia 🚀"
+  },
+  "stop phase\n        nextPhase();\n    }\n}\n\nfunction finishTest() {\n    document.getElementById('test-container').style.display = 'none';\n    document.getElementById('result-container').style.display = 'block';\n    \n    document.getElementById('j_max').value = jMaxIdx;\n    document.getElementById('s_max').value = sMaxIdx;\n    \n    let text = \"Basato sulle tue risposte:": {
+    "file": "placement",
+    "text": "stop phase\n        nextPhase();\n    }\n}\n\nfunction finishTest() {\n    document.getElementById('test-container').style.display = 'none';\n    document.getElementById('result-container').style.display = 'block';\n    \n    document.getElementById('j_max').value = jMaxIdx;\n    document.getElementById('s_max').value = sMaxIdx;\n    \n    let text = \"Basato sulle tue risposte:"
+  },
+  "\";\n    if (jMaxIdx === -1) text += \"": {
+    "file": "placement",
+    "text": "\";\n    if (jMaxIdx === -1) text += \""
+  },
+  "Jamo:": {
+    "file": "placement",
+    "text": "Jamo:"
+  },
+  "Principiante Assoluto": {
+    "file": "placement",
+    "text": "Principiante Assoluto"
+  },
+  "\";\n    else text += `": {
+    "file": "placement",
+    "text": "\";\n    else text += `"
+  },
+  "Livello stimato ${jMaxIdx + 1}/${jGroups.length}": {
+    "file": "placement",
+    "text": "Livello stimato ${jMaxIdx + 1}/${jGroups.length}"
+  },
+  "`;\n    \n    if (sMaxIdx === -1) text += \"": {
+    "file": "placement",
+    "text": "`;\n    \n    if (sMaxIdx === -1) text += \""
+  },
+  "Sillabe:": {
+    "file": "placement",
+    "text": "Sillabe:"
+  },
+  "Principiante Assoluto\";\n    else text += `": {
+    "file": "placement",
+    "text": "Principiante Assoluto\";\n    else text += `"
+  },
+  "Livello stimato ${sMaxIdx + 1}/${sGroups.length}`;\n    \n    document.getElementById('result-text').innerHTML = text;\n}\n\ndocument.getElementById('answer-input').addEventListener('keypress', function(e) {\n    if (e.key === 'Enter') submitAnswer(true);\n});\n\n// Start\nrenderQuestion();": {
+    "file": "placement",
+    "text": "Livello stimato ${sMaxIdx + 1}/${sGroups.length}`;\n    \n    document.getElementById('result-text').innerHTML = text;\n}\n\ndocument.getElementById('answer-input').addEventListener('keypress', function(e) {\n    if (e.key === 'Enter') submitAnswer(true);\n});\n\n// Start\nrenderQuestion();"
+  },
+  "🇮🇹 {{ word.m }}": {
+    "file": "zen_word_puzzle",
+    "text": "🇮🇹 {{ word.m }}"
+  },
+  "✓ Verifica": {
+    "file": "zen_word_puzzle",
+    "text": "✓ Verifica"
+  },
+  "💡 Mostra risposta": {
+    "file": "zen_word_puzzle",
+    "text": "💡 Mostra risposta"
+  },
+  "🎉": {
+    "file": "zen_word_puzzle",
+    "text": "🎉"
+  },
+  "Hai esaurito le parole disponibili. Impara più caratteri per sbloccare nuove parole!": {
+    "file": "zen_word_puzzle",
+    "text": "Hai esaurito le parole disponibili. Impara più caratteri per sbloccare nuove parole!"
+  },
+  "/* ── Group progress grid ──────────────────────────────── */\n.phase-section {\n  margin-bottom: 2rem;\n}\n.phase-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: .8rem;\n  flex-wrap: wrap;\n  gap: .5rem;\n}\n.phase-title {\n  font-size: 1rem;\n  font-weight: 700;\n  display: flex;\n  align-items: center;\n  gap: .5rem;\n}\n.phase-pct {\n  font-size: .82rem;\n  color: var(--text-muted);\n  background: var(--bg-glass);\n  border: 1px solid var(--border);\n  border-radius: 100px;\n  padding: .2rem .75rem;\n}\n.locked-badge {\n  font-size: .72rem;\n  background: rgba(255,255,255,.06);\n  border: 1px solid var(--border);\n  border-radius: 100px;\n  padding: .2rem .75rem;\n  color: var(--text-dim);\n}\n.groups-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));\n  gap: .6rem;\n}\n.group-tile {\n  background: var(--bg-glass);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-md);\n  padding: .7rem .5rem;\n  text-align: center;\n  transition: border-color .2s, transform .2s, box-shadow .2s;\n  cursor: default;\n  position: relative;\n  overflow: hidden;\n}\n.group-tile::after {\n  content: '';\n  position: absolute;\n  bottom: 0; left: 0;\n  height: 3px;\n  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));\n  transition: width .5s ease;\n}\n.group-tile.complete { border-color: rgba(94,231,160,.4); }\n.group-tile.complete::after { width: 100%; background: var(--accent-ok); }\n.group-tile.active  { border-color: rgba(0,170,255,.4); box-shadow: 0 0 14px rgba(0,170,255,.2); }\n.group-tile.active:hover  { transform: translateY(-3px); }\n.group-tile.locked  { opacity: .35; }\n\n.group-tile-chars {\n  font-family: 'Noto Sans KR', sans-serif;\n  font-size: 1.2rem;\n  color: var(--text-primary);\n  margin-bottom: .25rem;\n  line-height: 1.2;\n  letter-spacing: .04em;\n}\n.group-tile-label {\n  font-size: .62rem;\n  text-transform: uppercase;\n  letter-spacing: .06em;\n  color: var(--text-muted);\n  margin-bottom: .3rem;\n}\n.group-tile-pct {\n  font-size: .78rem;\n  font-weight: 700;\n}\n.pct-green  { color: var(--accent-ok); }\n.pct-blue   { color: var(--accent-1); }\n.pct-dim    { color: var(--text-dim); }\n\n/* group mini progress bar */\n.mini-bar {\n  height: 3px;\n  background: rgba(255,255,255,.07);\n  border-radius: 100px;\n  margin-top: .35rem;\n  overflow: hidden;\n}\n.mini-fill {\n  height: 100%;\n  border-radius: 100px;\n  background: linear-gradient(90deg, var(--accent-3), var(--accent-1));\n  transition: width .6s ease;\n}\n.mini-fill.done { background: var(--accent-ok); }": {
+    "file": "dashboard",
+    "text": "/* ── Group progress grid ──────────────────────────────── */\n.phase-section {\n  margin-bottom: 2rem;\n}\n.phase-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: .8rem;\n  flex-wrap: wrap;\n  gap: .5rem;\n}\n.phase-title {\n  font-size: 1rem;\n  font-weight: 700;\n  display: flex;\n  align-items: center;\n  gap: .5rem;\n}\n.phase-pct {\n  font-size: .82rem;\n  color: var(--text-muted);\n  background: var(--bg-glass);\n  border: 1px solid var(--border);\n  border-radius: 100px;\n  padding: .2rem .75rem;\n}\n.locked-badge {\n  font-size: .72rem;\n  background: rgba(255,255,255,.06);\n  border: 1px solid var(--border);\n  border-radius: 100px;\n  padding: .2rem .75rem;\n  color: var(--text-dim);\n}\n.groups-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));\n  gap: .6rem;\n}\n.group-tile {\n  background: var(--bg-glass);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-md);\n  padding: .7rem .5rem;\n  text-align: center;\n  transition: border-color .2s, transform .2s, box-shadow .2s;\n  cursor: default;\n  position: relative;\n  overflow: hidden;\n}\n.group-tile::after {\n  content: '';\n  position: absolute;\n  bottom: 0; left: 0;\n  height: 3px;\n  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));\n  transition: width .5s ease;\n}\n.group-tile.complete { border-color: rgba(94,231,160,.4); }\n.group-tile.complete::after { width: 100%; background: var(--accent-ok); }\n.group-tile.active  { border-color: rgba(0,170,255,.4); box-shadow: 0 0 14px rgba(0,170,255,.2); }\n.group-tile.active:hover  { transform: translateY(-3px); }\n.group-tile.locked  { opacity: .35; }\n\n.group-tile-chars {\n  font-family: 'Noto Sans KR', sans-serif;\n  font-size: 1.2rem;\n  color: var(--text-primary);\n  margin-bottom: .25rem;\n  line-height: 1.2;\n  letter-spacing: .04em;\n}\n.group-tile-label {\n  font-size: .62rem;\n  text-transform: uppercase;\n  letter-spacing: .06em;\n  color: var(--text-muted);\n  margin-bottom: .3rem;\n}\n.group-tile-pct {\n  font-size: .78rem;\n  font-weight: 700;\n}\n.pct-green  { color: var(--accent-ok); }\n.pct-blue   { color: var(--accent-1); }\n.pct-dim    { color: var(--text-dim); }\n\n/* group mini progress bar */\n.mini-bar {\n  height: 3px;\n  background: rgba(255,255,255,.07);\n  border-radius: 100px;\n  margin-top: .35rem;\n  overflow: hidden;\n}\n.mini-fill {\n  height: 100%;\n  border-radius: 100px;\n  background: linear-gradient(90deg, var(--accent-3), var(--accent-1));\n  transition: width .6s ease;\n}\n.mini-fill.done { background: var(--accent-ok); }"
+  },
+  "안녕하세요, {{ user.name.split(' ')[0] }}님! 👋": {
+    "file": "dashboard",
+    "text": "안녕하세요, {{ user.name.split(' ')[0] }}님! 👋"
+  },
+  "Pronti per studiare il coreano?": {
+    "file": "dashboard",
+    "text": "Pronti per studiare il coreano?"
+  },
+  "0 %}": {
+    "file": "dashboard",
+    "text": "0 %}"
+  },
+  "🪷 Zen Mode": {
+    "file": "dashboard",
+    "text": "🪷 Zen Mode"
+  },
+  "Hai già studiato in passato?": {
+    "file": "dashboard",
+    "text": "Hai già studiato in passato?"
+  },
+  "Fai il test di posizionamento per saltare le basi che già conosci e configurare subito il tuo profilo.": {
+    "file": "dashboard",
+    "text": "Fai il test di posizionamento per saltare le basi che già conosci e configurare subito il tuo profilo."
+  },
+  "Inizia il Test": {
+    "file": "dashboard",
+    "text": "Inizia il Test"
+  },
+  "🧠": {
+    "file": "dashboard",
+    "text": "🧠"
+  },
+  "Perché imparo così poco all'inizio?": {
+    "file": "dashboard",
+    "text": "Perché imparo così poco all'inizio?"
+  },
+  "Il nostro algoritmo SRS limita di proposito l'introduzione di nuovi concetti a": {
+    "file": "dashboard",
+    "text": "Il nostro algoritmo SRS limita di proposito l'introduzione di nuovi concetti a"
+  },
+  "pochi caratteri al giorno": {
+    "file": "dashboard",
+    "text": "pochi caratteri al giorno"
+  },
+  ". Questo evita il sovraccarico cognitivo e favorisce una memorizzazione a lungo termine. Una volta introdotti, i caratteri riappariranno per un ripasso dopo 10 minuti. Non preoccuparti, il ritmo accelererà naturalmente nei prossimi giorni!": {
+    "file": "dashboard",
+    "text": ". Questo evita il sovraccarico cognitivo e favorisce una memorizzazione a lungo termine. Una volta introdotti, i caratteri riappariranno per un ripasso dopo 10 minuti. Non preoccuparti, il ritmo accelererà naturalmente nei prossimi giorni!"
+  },
+  "⏱️ Tempo di studio oggi": {
+    "file": "dashboard",
+    "text": "⏱️ Tempo di studio oggi"
+  },
+  "/ {{ ts.target_daily_minutes }} min": {
+    "file": "dashboard",
+    "text": "/ {{ ts.target_daily_minutes }} min"
+  },
+  "0": {
+    "file": "dashboard",
+    "text": "0"
+  },
+  "⚡ {{ (ts.target_daily_minutes * 0.75) | int }} min": {
+    "file": "dashboard",
+    "text": "⚡ {{ (ts.target_daily_minutes * 0.75) | int }} min"
+  },
+  "🎯 {{ ts.target_daily_minutes }} min": {
+    "file": "dashboard",
+    "text": "🎯 {{ ts.target_daily_minutes }} min"
+  },
+  "🌟 Giorni Attivi": {
+    "file": "dashboard",
+    "text": "🌟 Giorni Attivi"
+  },
+  "questo mese": {
+    "file": "dashboard",
+    "text": "questo mese"
+  },
+  "🌱 Imparate oggi": {
+    "file": "dashboard",
+    "text": "🌱 Imparate oggi"
+  },
+  "carte introdotte": {
+    "file": "dashboard",
+    "text": "carte introdotte"
+  },
+  "Nessuna carta introdotta oggi": {
+    "file": "dashboard",
+    "text": "Nessuna carta introdotta oggi"
+  },
+  "📚 Da Ripassare": {
+    "file": "dashboard",
+    "text": "📚 Da Ripassare"
+  },
+  "max 25/giorno": {
+    "file": "dashboard",
+    "text": "max 25/giorno"
+  },
+  "📊 Jamo": {
+    "file": "dashboard",
+    "text": "📊 Jamo"
+  },
+  "🔤 Jamo": {
+    "file": "dashboard",
+    "text": "🔤 Jamo"
+  },
+  "자모": {
+    "file": "dashboard",
+    "text": "자모"
+  },
+  "▶ Gruppo corrente:": {
+    "file": "dashboard",
+    "text": "▶ Gruppo corrente:"
+  },
+  "— {{ progress.current_learn.progress.learned }}/{{ progress.current_learn.progress.total }} appresi": {
+    "file": "dashboard",
+    "text": "— {{ progress.current_learn.progress.learned }}/{{ progress.current_learn.progress.total }} appresi"
+  },
+  "🎌 Sillabe": {
+    "file": "dashboard",
+    "text": "🎌 Sillabe"
+  },
+  "음절": {
+    "file": "dashboard",
+    "text": "음절"
+  },
+  "🔒 Sblocca all'80% Jamo (ora {{ progress.jamo.phase.pct_learned }}%)": {
+    "file": "dashboard",
+    "text": "🔒 Sblocca all'80% Jamo (ora {{ progress.jamo.phase.pct_learned }}%)"
+  },
+  "🔒": {
+    "file": "dashboard",
+    "text": "🔒"
+  },
+  "📖 Vocaboli & Frasi": {
+    "file": "dashboard",
+    "text": "📖 Vocaboli & Frasi"
+  },
+  "🔒 Disponibile dopo le Sillabe": {
+    "file": "dashboard",
+    "text": "🔒 Disponibile dopo le Sillabe"
+  },
+  "300-500 parole ad alta frequenza + espressioni quotidiane. Sbloccato quando Jamo e Sillabe sono completati.": {
+    "file": "dashboard",
+    "text": "300-500 parole ad alta frequenza + espressioni quotidiane. Sbloccato quando Jamo e Sillabe sono completati."
+  },
+  "/* ── Page layout ─────────────────────────────────────────── */\n  .settings-page {\n    padding: 2rem 0 4rem;\n  }\n\n  .settings-header {\n    margin-bottom: 2.5rem;\n    text-align: center;\n  }\n\n  .settings-header h1 {\n    font-size: 2rem;\n    font-weight: 700;\n    color: var(--text-primary);\n    margin: 0 0 0.4rem;\n  }\n\n  .settings-header p {\n    color: var(--text-muted);\n    font-size: 0.95rem;\n    margin: 0;\n  }\n\n  /* ── Success toast ────────────────────────────────────────── */\n  .toast-success {\n    display: flex;\n    align-items: center;\n    gap: 0.6rem;\n    background: linear-gradient(135deg, rgba(94, 231, 223, 0.18), rgba(94, 231, 223, 0.08));\n    border: 1px solid rgba(94, 231, 223, 0.4);\n    border-radius: var(--radius-md);\n    padding: 0.85rem 1.2rem;\n    margin-bottom: 2rem;\n    color: #5ee7df;\n    font-weight: 600;\n    font-size: 0.95rem;\n    animation: slideDown 0.35s ease;\n  }\n\n  @keyframes slideDown {\n    from { opacity: 0; transform: translateY(-12px); }\n    to   { opacity: 1; transform: translateY(0); }\n  }\n\n  /* ── Section cards ────────────────────────────────────────── */\n  .settings-section {\n    margin-bottom: 1.75rem;\n  }\n\n  .settings-card {\n    border-left: 3px solid var(--accent-1);\n    padding: 1.75rem 1.75rem 1.5rem;\n    border-radius: var(--radius-md);\n  }\n\n  .settings-card-title {\n    font-size: 1.05rem;\n    font-weight: 700;\n    color: var(--text-primary);\n    margin: 0 0 1.5rem;\n    letter-spacing: 0.01em;\n  }\n\n  /* ── Field rows ───────────────────────────────────────────── */\n  .field-row {\n    margin-bottom: 1.75rem;\n  }\n\n  .field-row:last-child {\n    margin-bottom: 0;\n  }\n\n  .field-label {\n    display: block;\n    font-size: 0.875rem;\n    font-weight: 600;\n    color: var(--text-primary);\n    margin-bottom: 0.85rem;\n  }\n\n  /* ── Range inputs ─────────────────────────────────────────── */\n  .range-wrapper {\n    display: flex;\n    align-items: center;\n    gap: 1rem;\n    margin-bottom: 0.85rem;\n  }\n\n  .range-input {\n    -webkit-appearance: none;\n    appearance: none;\n    flex: 1;\n    height: 6px;\n    border-radius: 99px;\n    outline: none;\n    cursor: pointer;\n    background: linear-gradient(\n      to right,\n      var(--accent-1) 0%,\n      var(--accent-1) var(--fill-pct, 50%),\n      rgba(255,255,255,0.12) var(--fill-pct, 50%),\n      rgba(255,255,255,0.12) 100%\n    );\n    transition: background 0.15s ease;\n  }\n\n  .range-input::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    appearance: none;\n    width: 20px;\n    height: 20px;\n    border-radius: 50%;\n    background: var(--accent-1);\n    box-shadow: 0 0 0 3px rgba(180, 111, 255, 0.3), 0 2px 8px rgba(0,0,0,0.4);\n    cursor: pointer;\n    transition: transform 0.15s ease, box-shadow 0.15s ease;\n  }\n\n  .range-input::-webkit-slider-thumb:hover {\n    transform: scale(1.2);\n    box-shadow: 0 0 0 5px rgba(180, 111, 255, 0.25), 0 2px 10px rgba(0,0,0,0.5);\n  }\n\n  .range-input::-moz-range-thumb {\n    width: 20px;\n    height: 20px;\n    border: none;\n    border-radius: 50%;\n    background: var(--accent-1);\n    box-shadow: 0 0 0 3px rgba(180, 111, 255, 0.3);\n    cursor: pointer;\n  }\n\n  .range-value {\n    min-width: 70px;\n    text-align: right;\n    font-weight: 700;\n    font-size: 0.9rem;\n    color: var(--accent-1);\n    background: rgba(180, 111, 255, 0.12);\n    border: 1px solid rgba(180, 111, 255, 0.3);\n    border-radius: 8px;\n    padding: 0.3rem 0.65rem;\n    transition: color 0.2s, background 0.2s;\n  }\n\n  /* ── Preset buttons ───────────────────────────────────────── */\n  .preset-group {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 0.5rem;\n  }\n\n  .preset-btn {\n    padding: 0.35rem 0.9rem;\n    border-radius: 99px;\n    border: 1px solid var(--border);\n    background: rgba(255, 255, 255, 0.05);\n    color: var(--text-muted);\n    font-size: 0.82rem;\n    font-weight: 600;\n    cursor: pointer;\n    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;\n    font-family: 'Noto Sans KR', sans-serif;\n  }\n\n  .preset-btn:hover {\n    border-color: var(--accent-1);\n    color: var(--accent-1);\n    background: rgba(180, 111, 255, 0.1);\n    transform: translateY(-1px);\n  }\n\n  .preset-btn.active {\n    border-color: var(--accent-1);\n    background: rgba(180, 111, 255, 0.2);\n    color: var(--accent-1);\n  }\n\n  /* ── Divider between fields ───────────────────────────────── */\n  .field-divider {\n    border: none;\n    border-top: 1px solid var(--border);\n    margin: 1.75rem 0;\n    opacity: 0.5;\n  }\n\n  /* ── iOS toggle switch ────────────────────────────────────── */\n  .toggle-row {\n    display: flex;\n    align-items: flex-start;\n    gap: 1rem;\n  }\n\n  .toggle-label-group {\n    flex: 1;\n  }\n\n  .toggle-title {\n    font-size: 0.875rem;\n    font-weight: 600;\n    color: var(--text-primary);\n    margin-bottom: 0.3rem;\n  }\n\n  .toggle-description {\n    font-size: 0.8rem;\n    color: var(--text-muted);\n    line-height: 1.55;\n  }\n\n  .toggle-switch {\n    position: relative;\n    display: inline-block;\n    width: 52px;\n    height: 28px;\n    flex-shrink: 0;\n    margin-top: 2px;\n  }\n\n  .toggle-switch input {\n    opacity: 0;\n    width: 0;\n    height: 0;\n    position: absolute;\n  }\n\n  .toggle-track {\n    position: absolute;\n    inset: 0;\n    border-radius: 99px;\n    background: rgba(255, 255, 255, 0.15);\n    cursor: pointer;\n    transition: background 0.3s ease, box-shadow 0.3s ease;\n  }\n\n  .toggle-track::before {\n    content: '';\n    position: absolute;\n    left: 4px;\n    top: 50%;\n    transform: translateY(-50%);\n    width: 20px;\n    height: 20px;\n    border-radius: 50%;\n    background: #fff;\n    box-shadow: 0 1px 4px rgba(0,0,0,0.3);\n    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  }\n\n  .toggle-switch input:checked + .toggle-track {\n    background: linear-gradient(135deg, var(--accent-1), var(--accent-3));\n    box-shadow: 0 0 12px rgba(94, 231, 223, 0.35);\n  }\n\n  .toggle-switch input:checked + .toggle-track::before {\n    transform: translateY(-50%) translateX(24px);\n  }\n\n  .toggle-switch input:focus + .toggle-track {\n    outline: 2px solid var(--accent-1);\n    outline-offset: 2px;\n  }\n\n  /* ── Profile section ──────────────────────────────────────── */\n  .profile-row {\n    display: flex;\n    align-items: center;\n    gap: 1.1rem;\n  }\n\n  .profile-avatar {\n    width: 56px;\n    height: 56px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 2px solid var(--accent-1);\n    box-shadow: 0 0 0 4px rgba(180, 111, 255, 0.15);\n    flex-shrink: 0;\n  }\n\n  .profile-avatar-fallback {\n    width: 56px;\n    height: 56px;\n    border-radius: 50%;\n    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 1.4rem;\n    font-weight: 700;\n    color: #fff;\n    flex-shrink: 0;\n    border: 2px solid rgba(180, 111, 255, 0.5);\n  }\n\n  .profile-info {\n    flex: 1;\n    min-width: 0;\n  }\n\n  .profile-name {\n    font-weight: 700;\n    color: var(--text-primary);\n    font-size: 1rem;\n    margin-bottom: 0.2rem;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n  }\n\n  .profile-email {\n    color: var(--text-muted);\n    font-size: 0.82rem;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n  }\n\n  /* ── Form actions ─────────────────────────────────────────── */\n  .form-actions {\n    margin-top: 2rem;\n    display: flex;\n    flex-direction: column;\n    gap: 0.75rem;\n  }\n\n  .btn-full {\n    width: 100%;\n    justify-content: center;\n    text-align: center;\n    padding: 0.85rem 1.5rem;\n    font-size: 1rem;\n    border-radius: var(--radius-md);\n    font-weight: 700;\n    letter-spacing: 0.02em;\n  }\n\n  .btn-back {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 0.4rem;\n    text-decoration: none;\n  }\n\n  /* ── Responsive ───────────────────────────────────────────── */\n  @media (max-width: 540px) {\n    .settings-header h1 {\n      font-size: 1.6rem;\n    }\n\n    .settings-card {\n      padding: 1.25rem 1.1rem 1.1rem;\n    }\n\n    .profile-row {\n      flex-wrap: wrap;\n    }\n  }": {
+    "file": "settings",
+    "text": "/* ── Page layout ─────────────────────────────────────────── */\n  .settings-page {\n    padding: 2rem 0 4rem;\n  }\n\n  .settings-header {\n    margin-bottom: 2.5rem;\n    text-align: center;\n  }\n\n  .settings-header h1 {\n    font-size: 2rem;\n    font-weight: 700;\n    color: var(--text-primary);\n    margin: 0 0 0.4rem;\n  }\n\n  .settings-header p {\n    color: var(--text-muted);\n    font-size: 0.95rem;\n    margin: 0;\n  }\n\n  /* ── Success toast ────────────────────────────────────────── */\n  .toast-success {\n    display: flex;\n    align-items: center;\n    gap: 0.6rem;\n    background: linear-gradient(135deg, rgba(94, 231, 223, 0.18), rgba(94, 231, 223, 0.08));\n    border: 1px solid rgba(94, 231, 223, 0.4);\n    border-radius: var(--radius-md);\n    padding: 0.85rem 1.2rem;\n    margin-bottom: 2rem;\n    color: #5ee7df;\n    font-weight: 600;\n    font-size: 0.95rem;\n    animation: slideDown 0.35s ease;\n  }\n\n  @keyframes slideDown {\n    from { opacity: 0; transform: translateY(-12px); }\n    to   { opacity: 1; transform: translateY(0); }\n  }\n\n  /* ── Section cards ────────────────────────────────────────── */\n  .settings-section {\n    margin-bottom: 1.75rem;\n  }\n\n  .settings-card {\n    border-left: 3px solid var(--accent-1);\n    padding: 1.75rem 1.75rem 1.5rem;\n    border-radius: var(--radius-md);\n  }\n\n  .settings-card-title {\n    font-size: 1.05rem;\n    font-weight: 700;\n    color: var(--text-primary);\n    margin: 0 0 1.5rem;\n    letter-spacing: 0.01em;\n  }\n\n  /* ── Field rows ───────────────────────────────────────────── */\n  .field-row {\n    margin-bottom: 1.75rem;\n  }\n\n  .field-row:last-child {\n    margin-bottom: 0;\n  }\n\n  .field-label {\n    display: block;\n    font-size: 0.875rem;\n    font-weight: 600;\n    color: var(--text-primary);\n    margin-bottom: 0.85rem;\n  }\n\n  /* ── Range inputs ─────────────────────────────────────────── */\n  .range-wrapper {\n    display: flex;\n    align-items: center;\n    gap: 1rem;\n    margin-bottom: 0.85rem;\n  }\n\n  .range-input {\n    -webkit-appearance: none;\n    appearance: none;\n    flex: 1;\n    height: 6px;\n    border-radius: 99px;\n    outline: none;\n    cursor: pointer;\n    background: linear-gradient(\n      to right,\n      var(--accent-1) 0%,\n      var(--accent-1) var(--fill-pct, 50%),\n      rgba(255,255,255,0.12) var(--fill-pct, 50%),\n      rgba(255,255,255,0.12) 100%\n    );\n    transition: background 0.15s ease;\n  }\n\n  .range-input::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    appearance: none;\n    width: 20px;\n    height: 20px;\n    border-radius: 50%;\n    background: var(--accent-1);\n    box-shadow: 0 0 0 3px rgba(180, 111, 255, 0.3), 0 2px 8px rgba(0,0,0,0.4);\n    cursor: pointer;\n    transition: transform 0.15s ease, box-shadow 0.15s ease;\n  }\n\n  .range-input::-webkit-slider-thumb:hover {\n    transform: scale(1.2);\n    box-shadow: 0 0 0 5px rgba(180, 111, 255, 0.25), 0 2px 10px rgba(0,0,0,0.5);\n  }\n\n  .range-input::-moz-range-thumb {\n    width: 20px;\n    height: 20px;\n    border: none;\n    border-radius: 50%;\n    background: var(--accent-1);\n    box-shadow: 0 0 0 3px rgba(180, 111, 255, 0.3);\n    cursor: pointer;\n  }\n\n  .range-value {\n    min-width: 70px;\n    text-align: right;\n    font-weight: 700;\n    font-size: 0.9rem;\n    color: var(--accent-1);\n    background: rgba(180, 111, 255, 0.12);\n    border: 1px solid rgba(180, 111, 255, 0.3);\n    border-radius: 8px;\n    padding: 0.3rem 0.65rem;\n    transition: color 0.2s, background 0.2s;\n  }\n\n  /* ── Preset buttons ───────────────────────────────────────── */\n  .preset-group {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 0.5rem;\n  }\n\n  .preset-btn {\n    padding: 0.35rem 0.9rem;\n    border-radius: 99px;\n    border: 1px solid var(--border);\n    background: rgba(255, 255, 255, 0.05);\n    color: var(--text-muted);\n    font-size: 0.82rem;\n    font-weight: 600;\n    cursor: pointer;\n    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;\n    font-family: 'Noto Sans KR', sans-serif;\n  }\n\n  .preset-btn:hover {\n    border-color: var(--accent-1);\n    color: var(--accent-1);\n    background: rgba(180, 111, 255, 0.1);\n    transform: translateY(-1px);\n  }\n\n  .preset-btn.active {\n    border-color: var(--accent-1);\n    background: rgba(180, 111, 255, 0.2);\n    color: var(--accent-1);\n  }\n\n  /* ── Divider between fields ───────────────────────────────── */\n  .field-divider {\n    border: none;\n    border-top: 1px solid var(--border);\n    margin: 1.75rem 0;\n    opacity: 0.5;\n  }\n\n  /* ── iOS toggle switch ────────────────────────────────────── */\n  .toggle-row {\n    display: flex;\n    align-items: flex-start;\n    gap: 1rem;\n  }\n\n  .toggle-label-group {\n    flex: 1;\n  }\n\n  .toggle-title {\n    font-size: 0.875rem;\n    font-weight: 600;\n    color: var(--text-primary);\n    margin-bottom: 0.3rem;\n  }\n\n  .toggle-description {\n    font-size: 0.8rem;\n    color: var(--text-muted);\n    line-height: 1.55;\n  }\n\n  .toggle-switch {\n    position: relative;\n    display: inline-block;\n    width: 52px;\n    height: 28px;\n    flex-shrink: 0;\n    margin-top: 2px;\n  }\n\n  .toggle-switch input {\n    opacity: 0;\n    width: 0;\n    height: 0;\n    position: absolute;\n  }\n\n  .toggle-track {\n    position: absolute;\n    inset: 0;\n    border-radius: 99px;\n    background: rgba(255, 255, 255, 0.15);\n    cursor: pointer;\n    transition: background 0.3s ease, box-shadow 0.3s ease;\n  }\n\n  .toggle-track::before {\n    content: '';\n    position: absolute;\n    left: 4px;\n    top: 50%;\n    transform: translateY(-50%);\n    width: 20px;\n    height: 20px;\n    border-radius: 50%;\n    background: #fff;\n    box-shadow: 0 1px 4px rgba(0,0,0,0.3);\n    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  }\n\n  .toggle-switch input:checked + .toggle-track {\n    background: linear-gradient(135deg, var(--accent-1), var(--accent-3));\n    box-shadow: 0 0 12px rgba(94, 231, 223, 0.35);\n  }\n\n  .toggle-switch input:checked + .toggle-track::before {\n    transform: translateY(-50%) translateX(24px);\n  }\n\n  .toggle-switch input:focus + .toggle-track {\n    outline: 2px solid var(--accent-1);\n    outline-offset: 2px;\n  }\n\n  /* ── Profile section ──────────────────────────────────────── */\n  .profile-row {\n    display: flex;\n    align-items: center;\n    gap: 1.1rem;\n  }\n\n  .profile-avatar {\n    width: 56px;\n    height: 56px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 2px solid var(--accent-1);\n    box-shadow: 0 0 0 4px rgba(180, 111, 255, 0.15);\n    flex-shrink: 0;\n  }\n\n  .profile-avatar-fallback {\n    width: 56px;\n    height: 56px;\n    border-radius: 50%;\n    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 1.4rem;\n    font-weight: 700;\n    color: #fff;\n    flex-shrink: 0;\n    border: 2px solid rgba(180, 111, 255, 0.5);\n  }\n\n  .profile-info {\n    flex: 1;\n    min-width: 0;\n  }\n\n  .profile-name {\n    font-weight: 700;\n    color: var(--text-primary);\n    font-size: 1rem;\n    margin-bottom: 0.2rem;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n  }\n\n  .profile-email {\n    color: var(--text-muted);\n    font-size: 0.82rem;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n  }\n\n  /* ── Form actions ─────────────────────────────────────────── */\n  .form-actions {\n    margin-top: 2rem;\n    display: flex;\n    flex-direction: column;\n    gap: 0.75rem;\n  }\n\n  .btn-full {\n    width: 100%;\n    justify-content: center;\n    text-align: center;\n    padding: 0.85rem 1.5rem;\n    font-size: 1rem;\n    border-radius: var(--radius-md);\n    font-weight: 700;\n    letter-spacing: 0.02em;\n  }\n\n  .btn-back {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 0.4rem;\n    text-decoration: none;\n  }\n\n  /* ── Responsive ───────────────────────────────────────────── */\n  @media (max-width: 540px) {\n    .settings-header h1 {\n      font-size: 1.6rem;\n    }\n\n    .settings-card {\n      padding: 1.25rem 1.1rem 1.1rem;\n    }\n\n    .profile-row {\n      flex-wrap: wrap;\n    }\n  }"
+  },
+  "{# ── Header ───────────────────────────────────────────── #}": {
+    "file": "settings",
+    "text": "{# ── Header ───────────────────────────────────────────── #}"
+  },
+  "⚙️ Impostazioni": {
+    "file": "settings",
+    "text": "⚙️ Impostazioni"
+  },
+  "Personalizza il tuo percorso di apprendimento": {
+    "file": "settings",
+    "text": "Personalizza il tuo percorso di apprendimento"
+  },
+  "{# ── Success toast ─────────────────────────────────────── #}\n    {% if saved %}": {
+    "file": "settings",
+    "text": "{# ── Success toast ─────────────────────────────────────── #}\n    {% if saved %}"
+  },
+  "✅": {
+    "file": "settings",
+    "text": "✅"
+  },
+  "Impostazioni salvate!": {
+    "file": "settings",
+    "text": "Impostazioni salvate!"
+  },
+  "{# ── Section 1: Daily goals ──────────────────────────── #}": {
+    "file": "settings",
+    "text": "{# ── Section 1: Daily goals ──────────────────────────── #}"
+  },
+  "🎯 Obiettivi giornalieri": {
+    "file": "settings",
+    "text": "🎯 Obiettivi giornalieri"
+  },
+  "{# — Minutes per day — #}": {
+    "file": "settings",
+    "text": "{# — Minutes per day — #}"
+  },
+  "Minuti di studio al giorno": {
+    "file": "settings",
+    "text": "Minuti di studio al giorno"
+  },
+  "{# — New cards per day — #}": {
+    "file": "settings",
+    "text": "{# — New cards per day — #}"
+  },
+  "Nuove carte al giorno": {
+    "file": "settings",
+    "text": "Nuove carte al giorno"
+  },
+  "{# ── Section 2: Study mode ───────────────────────────── #}": {
+    "file": "settings",
+    "text": "{# ── Section 2: Study mode ───────────────────────────── #}"
+  },
+  "🧠 Modalità di studio": {
+    "file": "settings",
+    "text": "🧠 Modalità di studio"
+  },
+  "Blocco rigido al limite": {
+    "file": "settings",
+    "text": "Blocco rigido al limite"
+  },
+  "Quando": {
+    "file": "settings",
+    "text": "Quando"
+  },
+  "disattivato": {
+    "file": "settings",
+    "text": "disattivato"
+  },
+  "(consigliato): raggiunti gli obiettivi,\n                  l'app mostra un avviso gentile ma ti permette di continuare.\n                  Quando": {
+    "file": "settings",
+    "text": "(consigliato): raggiunti gli obiettivi,\n                  l'app mostra un avviso gentile ma ti permette di continuare.\n                  Quando"
+  },
+  "attivato": {
+    "file": "settings",
+    "text": "attivato"
+  },
+  ": reindirizza automaticamente alla Zen Mode.": {
+    "file": "settings",
+    "text": ": reindirizza automaticamente alla Zen Mode."
+  },
+  "{# ── Form actions ────────────────────────────────────── #}": {
+    "file": "settings",
+    "text": "{# ── Form actions ────────────────────────────────────── #}"
+  },
+  "💾 Salva Impostazioni": {
+    "file": "settings",
+    "text": "💾 Salva Impostazioni"
+  },
+  "← Dashboard": {
+    "file": "settings",
+    "text": "← Dashboard"
+  },
+  "{# /settings-form #}": {
+    "file": "settings",
+    "text": "{# /settings-form #}"
+  },
+  "Riposizionamento (Test)": {
+    "file": "settings",
+    "text": "Riposizionamento (Test)"
+  },
+  "Hai imparato nuovi caratteri fuori dall'app (es. leggendo manhwa)? \n          Puoi ripetere il test per sbloccare i livelli corrispondenti saltando le lezioni base.": {
+    "file": "settings",
+    "text": "Hai imparato nuovi caratteri fuori dall'app (es. leggendo manhwa)? \n          Puoi ripetere il test per sbloccare i livelli corrispondenti saltando le lezioni base."
+  },
+  "🧠 Fai il Test di Posizionamento": {
+    "file": "settings",
+    "text": "🧠 Fai il Test di Posizionamento"
+  },
+  "{# ── Section 3: Profile (read-only, outside form) ──────── #}": {
+    "file": "settings",
+    "text": "{# ── Section 3: Profile (read-only, outside form) ──────── #}"
+  },
+  "👤 Profilo": {
+    "file": "settings",
+    "text": "👤 Profilo"
+  },
+  "Disconnetti": {
+    "file": "settings",
+    "text": "Disconnetti"
+  },
+  "{# /container-sm #}": {
+    "file": "settings",
+    "text": "{# /container-sm #}"
+  },
+  "{# /settings-page #}\n{% endblock %}\n\n{% block scripts %}": {
+    "file": "settings",
+    "text": "{# /settings-page #}\n{% endblock %}\n\n{% block scripts %}"
+  },
+  "{\n    initRanges();\n    initToast();\n  });": {
+    "file": "settings",
+    "text": "{\n    initRanges();\n    initToast();\n  });"
+  },
+  "Ripasso completato!": {
+    "file": "review_done",
+    "text": "Ripasso completato!"
+  },
+  "Non hai altre carte da ripassare oggi. Ottimo lavoro!": {
+    "file": "review_done",
+    "text": "Non hai altre carte da ripassare oggi. Ottimo lavoro!"
+  },
+  ".zen-bg { background: radial-gradient(ellipse at top, rgba(0,170,255,.05) 0%, transparent 60%); }\n.zen-divider {\n  display: flex; align-items: center; gap: 1rem;\n  margin: 2.5rem 0; color: var(--text-dim); font-size: .75rem;\n  text-transform: uppercase; letter-spacing: .1em;\n}\n.zen-divider::before, .zen-divider::after {\n  content:''; flex:1; height:1px; background: var(--border);\n}": {
+    "file": "zen_mode",
+    "text": ".zen-bg { background: radial-gradient(ellipse at top, rgba(0,170,255,.05) 0%, transparent 60%); }\n.zen-divider {\n  display: flex; align-items: center; gap: 1rem;\n  margin: 2.5rem 0; color: var(--text-dim); font-size: .75rem;\n  text-transform: uppercase; letter-spacing: .1em;\n}\n.zen-divider::before, .zen-divider::after {\n  content:''; flex:1; height:1px; background: var(--border);\n}"
+  },
+  "🪷": {
+    "file": "zen_mode",
+    "text": "🪷"
+  },
+  "Zen Mode": {
+    "file": "zen_mode",
+    "text": "Zen Mode"
+  },
+  "Riposati, decodifica parole e osserva i caratteri che già conosci.": {
+    "file": "zen_mode",
+    "text": "Riposati, decodifica parole e osserva i caratteri che già conosci."
+  },
+  "Nessuna pressione, nessun punteggio.": {
+    "file": "zen_mode",
+    "text": "Nessuna pressione, nessun punteggio."
+  },
+  "🛑 Hai raggiunto i {{ ts.target_daily_minutes }} minuti oggi. Ottimo lavoro! Riprendi domani.": {
+    "file": "zen_mode",
+    "text": "🛑 Hai raggiunto i {{ ts.target_daily_minutes }} minuti oggi. Ottimo lavoro! Riprendi domani."
+  },
+  "⏱️ Oggi:": {
+    "file": "zen_mode",
+    "text": "⏱️ Oggi:"
+  },
+  "su {{ ts.target_daily_minutes }} min": {
+    "file": "zen_mode",
+    "text": "su {{ ts.target_daily_minutes }} min"
+  },
+  "Decodifica Parole 🔍": {
+    "file": "zen_mode",
+    "text": "Decodifica Parole 🔍"
+  },
+  "Hai": {
+    "file": "zen_mode",
+    "text": "Hai"
+  },
+  "📚": {
+    "file": "zen_mode",
+    "text": "📚"
+  },
+  "Impara almeno qualche Jamo per sbloccare le parole da decodificare!": {
+    "file": "zen_mode",
+    "text": "Impara almeno qualche Jamo per sbloccare le parole da decodificare!"
+  },
+  "🌱 Vai a Impara": {
+    "file": "zen_mode",
+    "text": "🌱 Vai a Impara"
+  },
+  "I tuoi caratteri 🎴": {
+    "file": "zen_mode",
+    "text": "I tuoi caratteri 🎴"
+  },
+  "@keyframes fadeSlideIn {\n  from { opacity:0; transform: translateY(10px); }\n  to   { opacity:1; transform: translateY(0); }\n}": {
+    "file": "zen_mode",
+    "text": "@keyframes fadeSlideIn {\n  from { opacity:0; transform: translateY(10px); }\n  to   { opacity:1; transform: translateY(0); }\n}"
+  },
+  "{\n    window.speechSynthesis.speak(utt);\n  }, 100);\n}": {
+    "file": "zen_mode",
+    "text": "{\n    window.speechSynthesis.speak(utt);\n  }, 100);\n}"
+  },
+  ".start-card {\n  max-width: 520px;\n  margin: 3rem auto;\n  background: var(--bg-glass);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-xl);\n  padding: 2.5rem 2rem;\n  box-shadow: var(--shadow-glow);\n}\n.how-step {\n  display: flex;\n  align-items: flex-start;\n  gap: 1rem;\n  margin-bottom: 1.2rem;\n}\n.step-num {\n  width: 32px; height: 32px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  color: #fff;\n  font-weight: 700;\n  font-size: .85rem;\n  display: flex; align-items: center; justify-content: center;\n  flex-shrink: 0;\n}\n.step-body strong { display:block; font-size:.92rem; margin-bottom:.15rem; }\n.step-body span   { font-size:.82rem; color: var(--text-muted); }\n.kbd {\n  display: inline-block;\n  background: rgba(255,255,255,.1);\n  border: 1px solid var(--border);\n  border-radius: 4px;\n  padding: .05rem .35rem;\n  font-size: .75rem;\n  font-family: monospace;\n  color: var(--text-muted);\n}": {
+    "file": "review_start",
+    "text": ".start-card {\n  max-width: 520px;\n  margin: 3rem auto;\n  background: var(--bg-glass);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-xl);\n  padding: 2.5rem 2rem;\n  box-shadow: var(--shadow-glow);\n}\n.how-step {\n  display: flex;\n  align-items: flex-start;\n  gap: 1rem;\n  margin-bottom: 1.2rem;\n}\n.step-num {\n  width: 32px; height: 32px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  color: #fff;\n  font-weight: 700;\n  font-size: .85rem;\n  display: flex; align-items: center; justify-content: center;\n  flex-shrink: 0;\n}\n.step-body strong { display:block; font-size:.92rem; margin-bottom:.15rem; }\n.step-body span   { font-size:.82rem; color: var(--text-muted); }\n.kbd {\n  display: inline-block;\n  background: rgba(255,255,255,.1);\n  border: 1px solid var(--border);\n  border-radius: 4px;\n  padding: .05rem .35rem;\n  font-size: .75rem;\n  font-family: monospace;\n  color: var(--text-muted);\n}"
+  },
+  "Pronto per il Ripasso?": {
+    "file": "review_start",
+    "text": "Pronto per il Ripasso?"
+  },
+  "Oggi hai": {
+    "file": "review_start",
+    "text": "Oggi hai"
+  },
+  "carte da ripassare\n        (max 25 al giorno).": {
+    "file": "review_start",
+    "text": "carte da ripassare\n        (max 25 al giorno)."
+  },
+  "Come funziona": {
+    "file": "review_start",
+    "text": "Come funziona"
+  },
+  "1": {
+    "file": "review_start",
+    "text": "1"
+  },
+  "Guarda il carattere": {
+    "file": "review_start",
+    "text": "Guarda il carattere"
+  },
+  "Viene mostrato un Jamo o una sillaba coreana.": {
+    "file": "review_start",
+    "text": "Viene mostrato un Jamo o una sillaba coreana."
+  },
+  "2": {
+    "file": "review_start",
+    "text": "2"
+  },
+  "Scrivi la lettura": {
+    "file": "review_start",
+    "text": "Scrivi la lettura"
+  },
+  "Digita la Romaja (es:": {
+    "file": "review_start",
+    "text": "Digita la Romaja (es:"
+  },
+  "ga": {
+    "file": "review_start",
+    "text": "ga"
+  },
+  ",": {
+    "file": "review_start",
+    "text": ","
+  },
+  "na": {
+    "file": "review_start",
+    "text": "na"
+  },
+  "eo": {
+    "file": "review_start",
+    "text": "eo"
+  },
+  ") e premi": {
+    "file": "review_start",
+    "text": ") e premi"
+  },
+  "Invio": {
+    "file": "review_start",
+    "text": "Invio"
+  },
+  "o il pulsante": {
+    "file": "review_start",
+    "text": "o il pulsante"
+  },
+  "Verifica": {
+    "file": "review_start",
+    "text": "Verifica"
+  },
+  ".": {
+    "file": "review_start",
+    "text": "."
+  },
+  "3": {
+    "file": "review_start",
+    "text": "3"
+  },
+  "Vedi il risultato": {
+    "file": "review_start",
+    "text": "Vedi il risultato"
+  },
+  "✅ Corretto → si avanza automaticamente.": {
+    "file": "review_start",
+    "text": "✅ Corretto → si avanza automaticamente."
+  },
+  "❌ Sbagliato → viene mostrata la risposta giusta.": {
+    "file": "review_start",
+    "text": "❌ Sbagliato → viene mostrata la risposta giusta."
+  },
+  "4": {
+    "file": "review_start",
+    "text": "4"
+  },
+  "Algoritmo SRS": {
+    "file": "review_start",
+    "text": "Algoritmo SRS"
+  },
+  "Le carte che sbagli tornano prima, quelle facili spariscono per giorni.\n                Il limite è 20 min/giorno — poi vai in": {
+    "file": "review_start",
+    "text": "Le carte che sbagli tornano prima, quelle facili spariscono per giorni.\n                Il limite è 20 min/giorno — poi vai in"
+  },
+  "⌨️ Scorciatoie tastiera": {
+    "file": "review_start",
+    "text": "⌨️ Scorciatoie tastiera"
+  },
+  "Verifica / Avanti": {
+    "file": "review_start",
+    "text": "Verifica / Avanti"
+  },
+  "Per niente": {
+    "file": "review_start",
+    "text": "Per niente"
+  },
+  "Faticoso": {
+    "file": "review_start",
+    "text": "Faticoso"
+  },
+  "Quasi bene": {
+    "file": "review_start",
+    "text": "Quasi bene"
+  },
+  "Perfetto": {
+    "file": "review_start",
+    "text": "Perfetto"
+  },
+  "🚀 Inizia Ripasso": {
+    "file": "review_start",
+    "text": "🚀 Inizia Ripasso"
+  },
+  "← Torna": {
+    "file": "review_start",
+    "text": "← Torna"
+  },
+  ".learn-hero {\n  background: linear-gradient(135deg, rgba(0,170,255,.12), rgba(255,79,94,.08));\n  border: 1px solid rgba(0,170,255,.25);\n  border-radius: var(--radius-xl);\n  padding: 2rem 2rem 1.6rem;\n  margin-bottom: 1.5rem;\n  box-shadow: 0 0 40px rgba(0,170,255,.15);\n}\n.group-intro-chars {\n  display: flex;\n  gap: .8rem;\n  flex-wrap: wrap;\n  justify-content: center;\n  margin: 1rem 0;\n}\n.intro-char {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  background: rgba(255,255,255,.06);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-md);\n  padding: .8rem .6rem;\n  min-width: 60px;\n  transition: border-color .2s, transform .2s;\n}\n.intro-char:hover { border-color: var(--accent-1); transform: translateY(-3px); }\n.intro-char .kr  { font-family: 'Noto Sans KR', sans-serif; font-size: 2rem; color: var(--accent-1); }\n.intro-char .rom { font-size: .72rem; color: var(--text-muted); margin-top: .2rem; }": {
+    "file": "learn_home",
+    "text": ".learn-hero {\n  background: linear-gradient(135deg, rgba(0,170,255,.12), rgba(255,79,94,.08));\n  border: 1px solid rgba(0,170,255,.25);\n  border-radius: var(--radius-xl);\n  padding: 2rem 2rem 1.6rem;\n  margin-bottom: 1.5rem;\n  box-shadow: 0 0 40px rgba(0,170,255,.15);\n}\n.group-intro-chars {\n  display: flex;\n  gap: .8rem;\n  flex-wrap: wrap;\n  justify-content: center;\n  margin: 1rem 0;\n}\n.intro-char {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  background: rgba(255,255,255,.06);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-md);\n  padding: .8rem .6rem;\n  min-width: 60px;\n  transition: border-color .2s, transform .2s;\n}\n.intro-char:hover { border-color: var(--accent-1); transform: translateY(-3px); }\n.intro-char .kr  { font-family: 'Noto Sans KR', sans-serif; font-size: 2rem; color: var(--accent-1); }\n.intro-char .rom { font-size: .72rem; color: var(--text-muted); margin-top: .2rem; }"
+  },
+  "🌱 Modalità Impara": {
+    "file": "learn_home",
+    "text": "🌱 Modalità Impara"
+  },
+  "Introduzione guidata di nuovi caratteri, gruppo per gruppo.": {
+    "file": "learn_home",
+    "text": "Introduzione guidata di nuovi caratteri, gruppo per gruppo."
+  },
+  "20 min max": {
+    "file": "learn_home",
+    "text": "20 min max"
+  },
+  "Appresi": {
+    "file": "learn_home",
+    "text": "Appresi"
+  },
+  "= max_new %}": {
+    "file": "learn_home",
+    "text": "= max_new %}"
+  },
+  "✅ Hai già introdotto {{ new_today }} nuove carte oggi (limite: {{ max_new }}).": {
+    "file": "learn_home",
+    "text": "✅ Hai già introdotto {{ new_today }} nuove carte oggi (limite: {{ max_new }})."
+  },
+  "Torna domani per continuare!": {
+    "file": "learn_home",
+    "text": "Torna domani per continuare!"
+  },
+  "📚 Ripassa ora": {
+    "file": "learn_home",
+    "text": "📚 Ripassa ora"
+  },
+  "🎉 Tutte le carte di questo gruppo sono state introdotte! Continua con il ripasso.": {
+    "file": "learn_home",
+    "text": "🎉 Tutte le carte di questo gruppo sono state introdotte! Continua con il ripasso."
+  },
+  "Sessione di oggi": {
+    "file": "learn_home",
+    "text": "Sessione di oggi"
+  },
+  "carte nuove": {
+    "file": "learn_home",
+    "text": "carte nuove"
+  },
+  "Già introdotte oggi: {{ new_today }}/{{ max_new }}": {
+    "file": "learn_home",
+    "text": "Già introdotte oggi: {{ new_today }}/{{ max_new }}"
+  },
+  "🚀 Inizia Sessione": {
+    "file": "learn_home",
+    "text": "🚀 Inizia Sessione"
+  },
+  "ℹ️ Come funziona la sessione": {
+    "file": "learn_home",
+    "text": "ℹ️ Come funziona la sessione"
+  },
+  "1️⃣": {
+    "file": "learn_home",
+    "text": "1️⃣"
+  },
+  "Studia": {
+    "file": "learn_home",
+    "text": "Studia"
+  },
+  "— vedi il Jamo/sillaba con lettura e nota mnemonica (4 sec)": {
+    "file": "learn_home",
+    "text": "— vedi il Jamo/sillaba con lettura e nota mnemonica (4 sec)"
+  },
+  "2️⃣": {
+    "file": "learn_home",
+    "text": "2️⃣"
+  },
+  "Quiz": {
+    "file": "learn_home",
+    "text": "Quiz"
+  },
+  "— scrivi la romanizzazione (Romaja) per verificare": {
+    "file": "learn_home",
+    "text": "— scrivi la romanizzazione (Romaja) per verificare"
+  },
+  "3️⃣": {
+    "file": "learn_home",
+    "text": "3️⃣"
+  },
+  "Avanza": {
+    "file": "learn_home",
+    "text": "Avanza"
+  },
+  "— la carta entra nel tuo sistema di ripasso SRS": {
+    "file": "learn_home",
+    "text": "— la carta entra nel tuo sistema di ripasso SRS"
+  },
+  "🏆": {
+    "file": "learn_home",
+    "text": "🏆"
+  },
+  "Tutti i caratteri appresi!": {
+    "file": "learn_home",
+    "text": "Tutti i caratteri appresi!"
+  },
+  "Hai completato Jamo e Sillabe. Continua con il ripasso SRS.": {
+    "file": "learn_home",
+    "text": "Hai completato Jamo e Sillabe. Continua con il ripasso SRS."
+  },
+  "/* ── Input answer ─────────────────────────────────────────── */\n.answer-area { max-width: 460px; margin: 1.5rem auto 0; }\n.answer-input-wrap { position: relative; display: flex; align-items: center; gap: .6rem; }\n#answer-input {\n  width: 100%; padding: .85rem 1.2rem; border-radius: var(--radius-md);\n  background: rgba(255,255,255,.06); border: 2px solid var(--border);\n  color: var(--text-primary); font-size: 1.35rem;\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  text-align: center; outline: none;\n  transition: border-color .2s, box-shadow .2s; letter-spacing: .08em;\n}\n#answer-input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,170,255,.18); }\n#answer-input.correct { border-color: var(--accent-ok); box-shadow: 0 0 0 3px rgba(94,231,160,.2); background: rgba(94,231,160,.07); }\n#answer-input.wrong { border-color: var(--accent-bad); box-shadow: 0 0 0 3px rgba(255,107,107,.2); background: rgba(255,107,107,.07); animation: shake .35s ease; }\n@keyframes shake {\n  0%,100%{transform:translateX(0)}\n  20%{transform:translateX(-8px)}\n  60%{transform:translateX(8px)}\n  80%{transform:translateX(-4px)}\n}\n.submit-btn {\n  padding: .85rem 1.4rem; border-radius: var(--radius-md);\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  color: #fff; border: none; font-weight: 700; font-size: 1rem;\n  cursor: pointer; white-space: nowrap;\n  transition: transform .15s, box-shadow .15s; flex-shrink: 0;\n}\n.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,170,255,.4); }\n\n#feedback-panel {\n  display: none; margin-top: 1rem; padding: 1rem 1.2rem;\n  border-radius: var(--radius-md); text-align: center; animation: fadeIn .25s ease;\n}\n@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }\n#feedback-panel.ok  { background: rgba(94,231,160,.1); border:1px solid rgba(94,231,160,.3); color: var(--accent-ok); }\n#feedback-panel.bad { background: rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3); color: var(--accent-bad); }\n.feedback-correct { font-size: 1.2rem; font-weight:700; margin-bottom:.3rem; }\n.feedback-hint    { font-size: .85rem; opacity:.85; }\n\n#quality-row { display: none; margin-top: 1rem; }\n\n#pause-overlay {\n  display: none; position: fixed; inset: 0;\n  background: rgba(13,13,20,.88); backdrop-filter: blur(10px);\n  z-index: 200; align-items: center; justify-content: center;\n  flex-direction: column; gap: 1rem;\n}\n#pause-overlay.visible { display: flex; }\n.pause-icon { font-size: 3.5rem; }\n.pause-text { font-size: 1.1rem; color: var(--text-muted); }": {
+    "file": "review",
+    "text": "/* ── Input answer ─────────────────────────────────────────── */\n.answer-area { max-width: 460px; margin: 1.5rem auto 0; }\n.answer-input-wrap { position: relative; display: flex; align-items: center; gap: .6rem; }\n#answer-input {\n  width: 100%; padding: .85rem 1.2rem; border-radius: var(--radius-md);\n  background: rgba(255,255,255,.06); border: 2px solid var(--border);\n  color: var(--text-primary); font-size: 1.35rem;\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  text-align: center; outline: none;\n  transition: border-color .2s, box-shadow .2s; letter-spacing: .08em;\n}\n#answer-input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,170,255,.18); }\n#answer-input.correct { border-color: var(--accent-ok); box-shadow: 0 0 0 3px rgba(94,231,160,.2); background: rgba(94,231,160,.07); }\n#answer-input.wrong { border-color: var(--accent-bad); box-shadow: 0 0 0 3px rgba(255,107,107,.2); background: rgba(255,107,107,.07); animation: shake .35s ease; }\n@keyframes shake {\n  0%,100%{transform:translateX(0)}\n  20%{transform:translateX(-8px)}\n  60%{transform:translateX(8px)}\n  80%{transform:translateX(-4px)}\n}\n.submit-btn {\n  padding: .85rem 1.4rem; border-radius: var(--radius-md);\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  color: #fff; border: none; font-weight: 700; font-size: 1rem;\n  cursor: pointer; white-space: nowrap;\n  transition: transform .15s, box-shadow .15s; flex-shrink: 0;\n}\n.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,170,255,.4); }\n\n#feedback-panel {\n  display: none; margin-top: 1rem; padding: 1rem 1.2rem;\n  border-radius: var(--radius-md); text-align: center; animation: fadeIn .25s ease;\n}\n@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }\n#feedback-panel.ok  { background: rgba(94,231,160,.1); border:1px solid rgba(94,231,160,.3); color: var(--accent-ok); }\n#feedback-panel.bad { background: rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3); color: var(--accent-bad); }\n.feedback-correct { font-size: 1.2rem; font-weight:700; margin-bottom:.3rem; }\n.feedback-hint    { font-size: .85rem; opacity:.85; }\n\n#quality-row { display: none; margin-top: 1rem; }\n\n#pause-overlay {\n  display: none; position: fixed; inset: 0;\n  background: rgba(13,13,20,.88); backdrop-filter: blur(10px);\n  z-index: 200; align-items: center; justify-content: center;\n  flex-direction: column; gap: 1rem;\n}\n#pause-overlay.visible { display: flex; }\n.pause-icon { font-size: 3.5rem; }\n.pause-text { font-size: 1.1rem; color: var(--text-muted); }"
+  },
+  "⏸️": {
+    "file": "review",
+    "text": "⏸️"
+  },
+  "Sessione in pausa — torna per riprendere": {
+    "file": "review",
+    "text": "Sessione in pausa — torna per riprendere"
+  },
+  "📚 Sessione di Ripasso": {
+    "file": "review",
+    "text": "📚 Sessione di Ripasso"
+  },
+  "⚡ Hai superato i 15 minuti! Finisci questo ripasso o": {
+    "file": "review",
+    "text": "⚡ Hai superato i 15 minuti! Finisci questo ripasso o"
+  },
+  "🔊": {
+    "file": "review",
+    "text": "🔊"
+  },
+  "Verifica →": {
+    "file": "review",
+    "text": "Verifica →"
+  },
+  "Quanto ti è venuto naturale?": {
+    "file": "review",
+    "text": "Quanto ti è venuto naturale?"
+  },
+  "❌ Per niente": {
+    "file": "review",
+    "text": "❌ Per niente"
+  },
+  "😓 Faticoso": {
+    "file": "review",
+    "text": "😓 Faticoso"
+  },
+  "🙂 Quasi bene": {
+    "file": "review",
+    "text": "🙂 Quasi bene"
+  },
+  "🌟 Perfetto!": {
+    "file": "review",
+    "text": "🌟 Perfetto!"
+  },
+  "2) q = 1;\n  const elapsed = Date.now() - _cardStart - (_pauseStart ? Date.now() - _pauseStart : 0);\n  document.getElementById('quality-input').value = q;\n  document.getElementById('time-ms-input').value = elapsed;\n  document.getElementById('review-form').submit();\n}\n\ndocument.addEventListener('keydown', function(e) {\n  if (!_answered) {\n    if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }\n  } else {\n    if (e.key === 'Enter') { e.preventDefault(); submitQuality(_wasCorrect ? 5 : 1); }\n    if (e.key === '1') submitQuality(0);\n    if (e.key === '2') submitQuality(1);\n    if (e.key === '3') submitQuality(3);\n    if (e.key === '4') submitQuality(5);\n  }\n});\n\ndocument.getElementById('answer-input').focus();": {
+    "file": "review",
+    "text": "2) q = 1;\n  const elapsed = Date.now() - _cardStart - (_pauseStart ? Date.now() - _pauseStart : 0);\n  document.getElementById('quality-input').value = q;\n  document.getElementById('time-ms-input').value = elapsed;\n  document.getElementById('review-form').submit();\n}\n\ndocument.addEventListener('keydown', function(e) {\n  if (!_answered) {\n    if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }\n  } else {\n    if (e.key === 'Enter') { e.preventDefault(); submitQuality(_wasCorrect ? 5 : 1); }\n    if (e.key === '1') submitQuality(0);\n    if (e.key === '2') submitQuality(1);\n    if (e.key === '3') submitQuality(3);\n    if (e.key === '4') submitQuality(5);\n  }\n});\n\ndocument.getElementById('answer-input').focus();"
+  },
+  "💡 Risposta mostrata — nessuna penalità": {
+    "file": "zen_word_result",
+    "text": "💡 Risposta mostrata — nessuna penalità"
+  },
+  "✅ Corretto! Ottimo!": {
+    "file": "zen_word_result",
+    "text": "✅ Corretto! Ottimo!"
+  },
+  "❌ Hai scritto:": {
+    "file": "zen_word_result",
+    "text": "❌ Hai scritto:"
+  },
+  "🔊 Ascolta": {
+    "file": "zen_word_result",
+    "text": "🔊 Ascolta"
+  },
+  "Prossima parola →": {
+    "file": "zen_word_result",
+    "text": "Prossima parola →"
+  },
+  "🎉 Hai visto tutte le parole disponibili!": {
+    "file": "zen_word_result",
+    "text": "🎉 Hai visto tutte le parole disponibili!"
+  },
+  "/* ── Page layout ──────────────────────────────────────────── */\n.learn-wrap {\n  max-width: 520px;\n  margin: 0 auto;\n  padding: 0 1rem 4rem;\n}\n\n/* ── Header row ───────────────────────────────────────────── */\n.learn-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: 1.2rem;\n  flex-wrap: wrap;\n  gap: .8rem;\n}\n.learn-header-left h1 {\n  font-size: 1.25rem;\n  font-weight: 700;\n  margin: 0 0 .15rem;\n}\n.learn-header-left p {\n  font-size: .8rem;\n  color: var(--text-muted);\n  margin: 0;\n}\n.learn-time-row {\n  display: flex;\n  align-items: center;\n  gap: .6rem;\n}\n.learn-time-val {\n  font-size: .8rem;\n  color: var(--text-muted);\n}\n\n/* ── Session progress bar (remaining cards) ───────────────── */\n.session-progress-wrap {\n  margin-bottom: 1.4rem;\n}\n.session-progress-label {\n  display: flex;\n  justify-content: space-between;\n  font-size: .72rem;\n  color: var(--text-dim);\n  margin-bottom: .35rem;\n}\n\n/* ── Phase badge ──────────────────────────────────────────── */\n.phase-badge {\n  display: inline-block;\n  background: rgba(0,170,255,.15);\n  border: 1px solid rgba(0,170,255,.3);\n  border-radius: 100px;\n  font-size: .72rem;\n  padding: .3rem .9rem;\n  color: var(--accent-1);\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: .06em;\n  margin-bottom: .9rem;\n}\n.group-badge {\n  display: inline-block;\n  background: rgba(94,231,223,.12);\n  border: 1px solid rgba(94,231,223,.25);\n  border-radius: 100px;\n  font-size: .68rem;\n  padding: .25rem .75rem;\n  color: var(--accent-3);\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: .05em;\n  margin-left: .5rem;\n}\n\n/* ── Flashcard container ──────────────────────────────────── */\n.learn-card {\n  background: linear-gradient(135deg, rgba(0,170,255,.15), rgba(255,79,94,.10));\n  border: 1px solid rgba(0,170,255,.35);\n  border-radius: var(--radius-xl);\n  box-shadow: 0 0 40px rgba(0,170,255,.18), 0 8px 32px rgba(0,0,0,.3);\n  padding: 2.2rem 2rem 1.8rem;\n  text-align: center;\n  position: relative;\n  overflow: hidden;\n  transition: box-shadow .3s;\n}\n.learn-card::before {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: radial-gradient(ellipse at 60% 20%, rgba(0,170,255,.08), transparent 65%);\n  pointer-events: none;\n}\n\n/* ── Main character display ───────────────────────────────── */\n.card-char-study {\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  font-size: 6.5rem;\n  font-weight: 700;\n  line-height: 1.1;\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  -webkit-background-clip: text;\n  -webkit-text-fill-color: transparent;\n  background-clip: text;\n  margin-bottom: .4rem;\n  user-select: none;\n}\n.card-char-quiz {\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  font-size: 4rem;\n  font-weight: 700;\n  line-height: 1.1;\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  -webkit-background-clip: text;\n  -webkit-text-fill-color: transparent;\n  background-clip: text;\n  margin-bottom: .6rem;\n  user-select: none;\n}\n\n/* ── Study phase: reading & romanji ──────────────────────── */\n.study-reading {\n  font-size: 2rem;\n  font-weight: 700;\n  color: var(--accent-3);\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  margin-bottom: .25rem;\n  letter-spacing: .04em;\n}\n.study-romanji {\n  font-size: 1rem;\n  color: var(--text-muted);\n  letter-spacing: .06em;\n  margin-bottom: 1.2rem;\n}\n\n/* ── Mnemonic / notes box ─────────────────────────────────── */\n.mnemonic-box {\n  background: rgba(255,190,85,.1);\n  border: 1px solid rgba(255,190,85,.25);\n  border-radius: 10px;\n  padding: .8rem 1rem;\n  text-align: left;\n  font-size: .88rem;\n  color: var(--text-primary);\n  display: flex;\n  gap: .6rem;\n  align-items: flex-start;\n  margin-top: .6rem;\n}\n.mnemonic-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }\n.mnemonic-text { line-height: 1.55; }\n\n/* ── Countdown bar ────────────────────────────────────────── */\n.countdown-wrap { margin-top: 1.4rem; position: relative; }\n.countdown-track { height: 4px; background: rgba(255,255,255,.08); border-radius: 100px; overflow: hidden; }\n.countdown-fill {\n  height: 100%; width: 100%;\n  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));\n  border-radius: 100px;\n  animation: countdown 4s linear forwards;\n}\n@keyframes countdown { from { width: 100%; } to { width: 0%; } }\n.countdown-label { font-size: .68rem; color: var(--text-dim); text-align: center; margin-top: .4rem; }\n\n/* ── \"Skip to quiz\" button ────────────────────────────────── */\n.skip-btn {\n  margin-top: 1rem; width: 100%; padding: .75rem 1rem;\n  border-radius: var(--radius-md); background: rgba(255,255,255,.06);\n  border: 1px solid var(--border); color: var(--text-muted);\n  font-size: .88rem; cursor: pointer;\n  transition: background .2s, color .2s, border-color .2s;\n  font-family: 'Inter', sans-serif;\n}\n.skip-btn:hover { background: rgba(0,170,255,.12); border-color: rgba(0,170,255,.4); color: var(--accent-1); }\n.skip-btn kbd {\n  display: inline-block; background: rgba(255,255,255,.1);\n  border: 1px solid rgba(255,255,255,.15); border-radius: 4px;\n  padding: .05rem .35rem; font-size: .75rem; margin: 0 .15rem;\n}\n\n/* ── Quiz phase ───────────────────────────────────────────── */\n#quiz-phase { display: none; }\n\n/* ── Quiz input ───────────────────────────────────────────── */\n.quiz-input-wrap {\n  display: flex; align-items: center; gap: .6rem;\n  max-width: 460px; margin: 1.2rem auto 0;\n}\n#quiz-input {\n  width: 100%; padding: .85rem 1.2rem;\n  border-radius: var(--radius-md);\n  background: rgba(255,255,255,.06);\n  border: 2px solid var(--border);\n  color: var(--text-primary); font-size: 1.35rem;\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  text-align: center; outline: none;\n  transition: border-color .2s, box-shadow .2s; letter-spacing: .08em;\n}\n#quiz-input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,170,255,.18); }\n#quiz-input.correct { border-color: var(--accent-ok); box-shadow: 0 0 0 3px rgba(94,231,160,.2); background: rgba(94,231,160,.07); }\n#quiz-input.wrong { border-color: var(--accent-bad); box-shadow: 0 0 0 3px rgba(255,107,107,.2); background: rgba(255,107,107,.07); animation: shake .35s ease; }\n@keyframes shake {\n  0%,100% { transform: translateX(0); }\n  20%      { transform: translateX(-8px); }\n  60%      { transform: translateX(8px); }\n  80%      { transform: translateX(-4px); }\n}\n.quiz-submit-btn {\n  padding: .85rem 1.4rem; border-radius: var(--radius-md);\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  color: #fff; border: none; font-weight: 700; font-size: 1rem;\n  cursor: pointer; white-space: nowrap;\n  transition: transform .15s, box-shadow .15s; flex-shrink: 0;\n  font-family: 'Inter', sans-serif;\n}\n.quiz-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,170,255,.4); }\n\n/* ── Feedback panel ───────────────────────────────────────── */\n#feedback-panel {\n  display: none; max-width: 460px; margin: 1rem auto 0;\n  padding: 1rem 1.2rem; border-radius: var(--radius-md);\n  text-align: center; animation: fadeIn .25s ease;\n}\n@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }\n#feedback-panel.ok  { background: rgba(94,231,160,.1); border: 1px solid rgba(94,231,160,.3); color: var(--accent-ok); }\n#feedback-panel.bad { background: rgba(255,107,107,.1); border: 1px solid rgba(255,107,107,.3); color: var(--accent-bad); }\n.feedback-main { font-size: 1.15rem; font-weight: 700; margin-bottom: .3rem; }\n.feedback-sub  { font-size: .85rem; opacity: .85; }\n\n/* ── \"Continue anyway\" button (shown on wrong answer) ─────── */\n#continue-btn {\n  display: none; max-width: 460px; margin: .8rem auto 0; width: 100%;\n  padding: .75rem 1.2rem; border-radius: var(--radius-md);\n  background: rgba(255,255,255,.06); border: 1px solid var(--border);\n  color: var(--text-muted); font-size: .9rem; cursor: pointer;\n  transition: background .2s, color .2s; font-family: 'Inter', sans-serif;\n}\n#continue-btn:hover { background: rgba(255,107,107,.12); color: var(--accent-bad); }\n\n/* ── Hidden learn form ────────────────────────────────────── */\n#learn-form { display: none; }\n\n/* ── Pause overlay ────────────────────────────────────────── */\n#pause-overlay {\n  display: none; position: fixed; inset: 0;\n  background: rgba(13,13,20,.88); backdrop-filter: blur(10px);\n  z-index: 200; align-items: center; justify-content: center;\n  flex-direction: column; gap: 1rem;\n}\n#pause-overlay.visible { display: flex; }\n.pause-icon { font-size: 3.5rem; }\n.pause-text { font-size: 1.1rem; color: var(--text-muted); }": {
+    "file": "learn_card",
+    "text": "/* ── Page layout ──────────────────────────────────────────── */\n.learn-wrap {\n  max-width: 520px;\n  margin: 0 auto;\n  padding: 0 1rem 4rem;\n}\n\n/* ── Header row ───────────────────────────────────────────── */\n.learn-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: 1.2rem;\n  flex-wrap: wrap;\n  gap: .8rem;\n}\n.learn-header-left h1 {\n  font-size: 1.25rem;\n  font-weight: 700;\n  margin: 0 0 .15rem;\n}\n.learn-header-left p {\n  font-size: .8rem;\n  color: var(--text-muted);\n  margin: 0;\n}\n.learn-time-row {\n  display: flex;\n  align-items: center;\n  gap: .6rem;\n}\n.learn-time-val {\n  font-size: .8rem;\n  color: var(--text-muted);\n}\n\n/* ── Session progress bar (remaining cards) ───────────────── */\n.session-progress-wrap {\n  margin-bottom: 1.4rem;\n}\n.session-progress-label {\n  display: flex;\n  justify-content: space-between;\n  font-size: .72rem;\n  color: var(--text-dim);\n  margin-bottom: .35rem;\n}\n\n/* ── Phase badge ──────────────────────────────────────────── */\n.phase-badge {\n  display: inline-block;\n  background: rgba(0,170,255,.15);\n  border: 1px solid rgba(0,170,255,.3);\n  border-radius: 100px;\n  font-size: .72rem;\n  padding: .3rem .9rem;\n  color: var(--accent-1);\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: .06em;\n  margin-bottom: .9rem;\n}\n.group-badge {\n  display: inline-block;\n  background: rgba(94,231,223,.12);\n  border: 1px solid rgba(94,231,223,.25);\n  border-radius: 100px;\n  font-size: .68rem;\n  padding: .25rem .75rem;\n  color: var(--accent-3);\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: .05em;\n  margin-left: .5rem;\n}\n\n/* ── Flashcard container ──────────────────────────────────── */\n.learn-card {\n  background: linear-gradient(135deg, rgba(0,170,255,.15), rgba(255,79,94,.10));\n  border: 1px solid rgba(0,170,255,.35);\n  border-radius: var(--radius-xl);\n  box-shadow: 0 0 40px rgba(0,170,255,.18), 0 8px 32px rgba(0,0,0,.3);\n  padding: 2.2rem 2rem 1.8rem;\n  text-align: center;\n  position: relative;\n  overflow: hidden;\n  transition: box-shadow .3s;\n}\n.learn-card::before {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: radial-gradient(ellipse at 60% 20%, rgba(0,170,255,.08), transparent 65%);\n  pointer-events: none;\n}\n\n/* ── Main character display ───────────────────────────────── */\n.card-char-study {\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  font-size: 6.5rem;\n  font-weight: 700;\n  line-height: 1.1;\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  -webkit-background-clip: text;\n  -webkit-text-fill-color: transparent;\n  background-clip: text;\n  margin-bottom: .4rem;\n  user-select: none;\n}\n.card-char-quiz {\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  font-size: 4rem;\n  font-weight: 700;\n  line-height: 1.1;\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  -webkit-background-clip: text;\n  -webkit-text-fill-color: transparent;\n  background-clip: text;\n  margin-bottom: .6rem;\n  user-select: none;\n}\n\n/* ── Study phase: reading & romanji ──────────────────────── */\n.study-reading {\n  font-size: 2rem;\n  font-weight: 700;\n  color: var(--accent-3);\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  margin-bottom: .25rem;\n  letter-spacing: .04em;\n}\n.study-romanji {\n  font-size: 1rem;\n  color: var(--text-muted);\n  letter-spacing: .06em;\n  margin-bottom: 1.2rem;\n}\n\n/* ── Mnemonic / notes box ─────────────────────────────────── */\n.mnemonic-box {\n  background: rgba(255,190,85,.1);\n  border: 1px solid rgba(255,190,85,.25);\n  border-radius: 10px;\n  padding: .8rem 1rem;\n  text-align: left;\n  font-size: .88rem;\n  color: var(--text-primary);\n  display: flex;\n  gap: .6rem;\n  align-items: flex-start;\n  margin-top: .6rem;\n}\n.mnemonic-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }\n.mnemonic-text { line-height: 1.55; }\n\n/* ── Countdown bar ────────────────────────────────────────── */\n.countdown-wrap { margin-top: 1.4rem; position: relative; }\n.countdown-track { height: 4px; background: rgba(255,255,255,.08); border-radius: 100px; overflow: hidden; }\n.countdown-fill {\n  height: 100%; width: 100%;\n  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));\n  border-radius: 100px;\n  animation: countdown 4s linear forwards;\n}\n@keyframes countdown { from { width: 100%; } to { width: 0%; } }\n.countdown-label { font-size: .68rem; color: var(--text-dim); text-align: center; margin-top: .4rem; }\n\n/* ── \"Skip to quiz\" button ────────────────────────────────── */\n.skip-btn {\n  margin-top: 1rem; width: 100%; padding: .75rem 1rem;\n  border-radius: var(--radius-md); background: rgba(255,255,255,.06);\n  border: 1px solid var(--border); color: var(--text-muted);\n  font-size: .88rem; cursor: pointer;\n  transition: background .2s, color .2s, border-color .2s;\n  font-family: 'Inter', sans-serif;\n}\n.skip-btn:hover { background: rgba(0,170,255,.12); border-color: rgba(0,170,255,.4); color: var(--accent-1); }\n.skip-btn kbd {\n  display: inline-block; background: rgba(255,255,255,.1);\n  border: 1px solid rgba(255,255,255,.15); border-radius: 4px;\n  padding: .05rem .35rem; font-size: .75rem; margin: 0 .15rem;\n}\n\n/* ── Quiz phase ───────────────────────────────────────────── */\n#quiz-phase { display: none; }\n\n/* ── Quiz input ───────────────────────────────────────────── */\n.quiz-input-wrap {\n  display: flex; align-items: center; gap: .6rem;\n  max-width: 460px; margin: 1.2rem auto 0;\n}\n#quiz-input {\n  width: 100%; padding: .85rem 1.2rem;\n  border-radius: var(--radius-md);\n  background: rgba(255,255,255,.06);\n  border: 2px solid var(--border);\n  color: var(--text-primary); font-size: 1.35rem;\n  font-family: 'Noto Sans KR', 'Inter', sans-serif;\n  text-align: center; outline: none;\n  transition: border-color .2s, box-shadow .2s; letter-spacing: .08em;\n}\n#quiz-input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,170,255,.18); }\n#quiz-input.correct { border-color: var(--accent-ok); box-shadow: 0 0 0 3px rgba(94,231,160,.2); background: rgba(94,231,160,.07); }\n#quiz-input.wrong { border-color: var(--accent-bad); box-shadow: 0 0 0 3px rgba(255,107,107,.2); background: rgba(255,107,107,.07); animation: shake .35s ease; }\n@keyframes shake {\n  0%,100% { transform: translateX(0); }\n  20%      { transform: translateX(-8px); }\n  60%      { transform: translateX(8px); }\n  80%      { transform: translateX(-4px); }\n}\n.quiz-submit-btn {\n  padding: .85rem 1.4rem; border-radius: var(--radius-md);\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  color: #fff; border: none; font-weight: 700; font-size: 1rem;\n  cursor: pointer; white-space: nowrap;\n  transition: transform .15s, box-shadow .15s; flex-shrink: 0;\n  font-family: 'Inter', sans-serif;\n}\n.quiz-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,170,255,.4); }\n\n/* ── Feedback panel ───────────────────────────────────────── */\n#feedback-panel {\n  display: none; max-width: 460px; margin: 1rem auto 0;\n  padding: 1rem 1.2rem; border-radius: var(--radius-md);\n  text-align: center; animation: fadeIn .25s ease;\n}\n@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }\n#feedback-panel.ok  { background: rgba(94,231,160,.1); border: 1px solid rgba(94,231,160,.3); color: var(--accent-ok); }\n#feedback-panel.bad { background: rgba(255,107,107,.1); border: 1px solid rgba(255,107,107,.3); color: var(--accent-bad); }\n.feedback-main { font-size: 1.15rem; font-weight: 700; margin-bottom: .3rem; }\n.feedback-sub  { font-size: .85rem; opacity: .85; }\n\n/* ── \"Continue anyway\" button (shown on wrong answer) ─────── */\n#continue-btn {\n  display: none; max-width: 460px; margin: .8rem auto 0; width: 100%;\n  padding: .75rem 1.2rem; border-radius: var(--radius-md);\n  background: rgba(255,255,255,.06); border: 1px solid var(--border);\n  color: var(--text-muted); font-size: .9rem; cursor: pointer;\n  transition: background .2s, color .2s; font-family: 'Inter', sans-serif;\n}\n#continue-btn:hover { background: rgba(255,107,107,.12); color: var(--accent-bad); }\n\n/* ── Hidden learn form ────────────────────────────────────── */\n#learn-form { display: none; }\n\n/* ── Pause overlay ────────────────────────────────────────── */\n#pause-overlay {\n  display: none; position: fixed; inset: 0;\n  background: rgba(13,13,20,.88); backdrop-filter: blur(10px);\n  z-index: 200; align-items: center; justify-content: center;\n  flex-direction: column; gap: 1rem;\n}\n#pause-overlay.visible { display: flex; }\n.pause-icon { font-size: 3.5rem; }\n.pause-text { font-size: 1.1rem; color: var(--text-muted); }"
+  },
+  "/ 20 min": {
+    "file": "learn_card",
+    "text": "/ 20 min"
+  },
+  "Progresso sessione": {
+    "file": "learn_card",
+    "text": "Progresso sessione"
+  },
+  "⚡ Fast-Lane": {
+    "file": "learn_card",
+    "text": "⚡ Fast-Lane"
+  },
+  "Avanzamento automatico tra 4 secondi&hellip;": {
+    "file": "learn_card",
+    "text": "Avanzamento automatico tra 4 secondi&hellip;"
+  },
+  "Ho capito &rarr; Quiz &nbsp;": {
+    "file": "learn_card",
+    "text": "Ho capito &rarr; Quiz &nbsp;"
+  },
+  "Spazio": {
+    "file": "learn_card",
+    "text": "Spazio"
+  },
+  "Come si legge questo carattere? (Romaja)": {
+    "file": "learn_card",
+    "text": "Come si legge questo carattere? (Romaja)"
+  },
+  "Verifica &rarr;": {
+    "file": "learn_card",
+    "text": "Verifica &rarr;"
+  },
+  "Avanti &rarr; &nbsp;": {
+    "file": "learn_card",
+    "text": "Avanti &rarr; &nbsp;"
+  },
+  "Enter": {
+    "file": "learn_card",
+    "text": "Enter"
+  },
+  "targets.push(normalise(t)));\n    }\n  }\n  \n  return targets.includes(n);\n}\n\n// ── Switch from study to quiz ─────────────────────────────────────\nfunction startQuiz() {\n  if (_studyDone) return;\n  _studyDone = true;\n  if (_autoTimer) { clearTimeout(_autoTimer); _autoTimer = null; }\n\n  document.getElementById('study-phase').style.display = 'none';\n  document.getElementById('quiz-phase').style.display  = 'block';\n  \n  document.getElementById('quiz-input').focus();\n  speakText('{{ card.front }}'); // Auto-play when quiz starts\n\n  _quizStart = Date.now();\n\n  const inp = document.getElementById('quiz-input');\n  inp.focus();\n}\n\n{% if uc.fast_lane %}\n// Fast-lane: skip study phase immediately\nstartQuiz();\n{% else %}\n// Auto-advance after 4 seconds during study phase\n_autoTimer = setTimeout(startQuiz, 4000);\n{% endif %}\n\n// ── Check answer ──────────────────────────────────────────────────\nfunction checkAnswer() {\n  if (_answered) return;\n\n  const inp = document.getElementById('quiz-input');\n  const val = inp.value;\n  if (!val.trim()) { inp.focus(); return; }\n\n  _answered   = true;\n  _wasCorrect = isMatch(val);\n\n  inp.disabled = true;\n  inp.classList.add(_wasCorrect ? 'correct' : 'wrong');\n  document.getElementById('verify-btn').disabled = true;\n\n  const panel = document.getElementById('feedback-panel');\n  const fMain = document.getElementById('feedback-main');\n  const fSub  = document.getElementById('feedback-sub');\n  panel.style.display = 'block';\n\n  if (_wasCorrect) {\n    panel.className    = 'ok';\n    fMain.textContent  = '\\u2705 Corretto!';\n    fSub.textContent   = CORRECT_ANSWER + (CORRECT_ROMANJI ? ' \\u2014 ' + CORRECT_ROMANJI : '');\n    // Auto-advance after 0.8s on correct\n    setTimeout(submitLearn, 800);\n  } else {\n    document.getElementById('fast_lane_failed').value = \"true\";\n    panel.className   = 'bad';\n    fMain.textContent = '\\u274C Risposta: ' + CORRECT_ANSWER;\n    fSub.textContent  = (CORRECT_ROMANJI ? CORRECT_ROMANJI + ' \\u2014 ' : '') + 'Hai scritto: \"' + val + '\"';\n    // Show continue button\n    document.getElementById('continue-btn').style.display = 'block';\n  }\n}\n\n// ── Submit learn result ────────────────────────────────────────────\nfunction submitLearn() {\n  const now     = Date.now();\n  const elapsed = now - (_quizStart || _cardStart) -\n                  (_pauseStart ? now - _pauseStart : 0);\n  document.getElementById('time-ms-input').value = elapsed;\n  document.getElementById('learn-form').submit();\n}\n\n// ── Keyboard shortcuts ─────────────────────────────────────────────\ndocument.addEventListener('keydown', function(e) {\n  if (!_studyDone) {\n    if (e.key === ' ' || e.key === 'Enter') {\n      e.preventDefault();\n      startQuiz();\n    }\n    return;\n  }\n\n  if (!_answered) {\n    if (e.key === 'Enter') {\n      e.preventDefault();\n      checkAnswer();\n    }\n    return;\n  }\n\n  if (e.key === 'Enter') {\n    e.preventDefault();\n    submitLearn();\n  }\n});": {
+    "file": "learn_card",
+    "text": "targets.push(normalise(t)));\n    }\n  }\n  \n  return targets.includes(n);\n}\n\n// ── Switch from study to quiz ─────────────────────────────────────\nfunction startQuiz() {\n  if (_studyDone) return;\n  _studyDone = true;\n  if (_autoTimer) { clearTimeout(_autoTimer); _autoTimer = null; }\n\n  document.getElementById('study-phase').style.display = 'none';\n  document.getElementById('quiz-phase').style.display  = 'block';\n  \n  document.getElementById('quiz-input').focus();\n  speakText('{{ card.front }}'); // Auto-play when quiz starts\n\n  _quizStart = Date.now();\n\n  const inp = document.getElementById('quiz-input');\n  inp.focus();\n}\n\n{% if uc.fast_lane %}\n// Fast-lane: skip study phase immediately\nstartQuiz();\n{% else %}\n// Auto-advance after 4 seconds during study phase\n_autoTimer = setTimeout(startQuiz, 4000);\n{% endif %}\n\n// ── Check answer ──────────────────────────────────────────────────\nfunction checkAnswer() {\n  if (_answered) return;\n\n  const inp = document.getElementById('quiz-input');\n  const val = inp.value;\n  if (!val.trim()) { inp.focus(); return; }\n\n  _answered   = true;\n  _wasCorrect = isMatch(val);\n\n  inp.disabled = true;\n  inp.classList.add(_wasCorrect ? 'correct' : 'wrong');\n  document.getElementById('verify-btn').disabled = true;\n\n  const panel = document.getElementById('feedback-panel');\n  const fMain = document.getElementById('feedback-main');\n  const fSub  = document.getElementById('feedback-sub');\n  panel.style.display = 'block';\n\n  if (_wasCorrect) {\n    panel.className    = 'ok';\n    fMain.textContent  = '\\u2705 Corretto!';\n    fSub.textContent   = CORRECT_ANSWER + (CORRECT_ROMANJI ? ' \\u2014 ' + CORRECT_ROMANJI : '');\n    // Auto-advance after 0.8s on correct\n    setTimeout(submitLearn, 800);\n  } else {\n    document.getElementById('fast_lane_failed').value = \"true\";\n    panel.className   = 'bad';\n    fMain.textContent = '\\u274C Risposta: ' + CORRECT_ANSWER;\n    fSub.textContent  = (CORRECT_ROMANJI ? CORRECT_ROMANJI + ' \\u2014 ' : '') + 'Hai scritto: \"' + val + '\"';\n    // Show continue button\n    document.getElementById('continue-btn').style.display = 'block';\n  }\n}\n\n// ── Submit learn result ────────────────────────────────────────────\nfunction submitLearn() {\n  const now     = Date.now();\n  const elapsed = now - (_quizStart || _cardStart) -\n                  (_pauseStart ? now - _pauseStart : 0);\n  document.getElementById('time-ms-input').value = elapsed;\n  document.getElementById('learn-form').submit();\n}\n\n// ── Keyboard shortcuts ─────────────────────────────────────────────\ndocument.addEventListener('keydown', function(e) {\n  if (!_studyDone) {\n    if (e.key === ' ' || e.key === 'Enter') {\n      e.preventDefault();\n      startQuiz();\n    }\n    return;\n  }\n\n  if (!_answered) {\n    if (e.key === 'Enter') {\n      e.preventDefault();\n      checkAnswer();\n    }\n    return;\n  }\n\n  if (e.key === 'Enter') {\n    e.preventDefault();\n    submitLearn();\n  }\n});"
+  },
+  "Impara il Coreano": {
+    "file": "login",
+    "text": "Impara il Coreano"
+  },
+  "Un percorso gamificato, senza punizioni.": {
+    "file": "login",
+    "text": "Un percorso gamificato, senza punizioni."
+  },
+  "15 minuti al giorno per dominare l'Hangul.": {
+    "file": "login",
+    "text": "15 minuti al giorno per dominare l'Hangul."
+  },
+  "⚠️ Accesso negato: {{ error }}": {
+    "file": "login",
+    "text": "⚠️ Accesso negato: {{ error }}"
+  },
+  "🎴": {
+    "file": "login",
+    "text": "🎴"
+  },
+  "SRS adattivo – Jamo, Sillabe, Vocaboli": {
+    "file": "login",
+    "text": "SRS adattivo – Jamo, Sillabe, Vocaboli"
+  },
+  "⏱️": {
+    "file": "login",
+    "text": "⏱️"
+  },
+  "Limite guidato di 15-20 min/giorno": {
+    "file": "login",
+    "text": "Limite guidato di 15-20 min/giorno"
+  },
+  "Zen Mode senza pressione": {
+    "file": "login",
+    "text": "Zen Mode senza pressione"
+  },
+  "🌟": {
+    "file": "login",
+    "text": "🌟"
+  },
+  "Giorni Attivi mensili – nessuna streak punitiva": {
+    "file": "login",
+    "text": "Giorni Attivi mensili – nessuna streak punitiva"
+  },
+  "Accedi con Google": {
+    "file": "login",
+    "text": "Accedi con Google"
+  },
+  "Accedendo accetti i termini di utilizzo. I dati sono archiviati localmente.": {
+    "file": "login",
+    "text": "Accedendo accetti i termini di utilizzo. I dati sono archiviati localmente."
+  },
+  ".done-wrap { max-width: 480px; margin: 0 auto; padding: 3.5rem 1rem 4rem; text-align: center; }\n.done-emoji { font-size: 5rem; line-height: 1; margin-bottom: 1.2rem; animation: popIn .45s cubic-bezier(.34,1.56,.64,1) both; }\n@keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }\n.done-title {\n  font-size: 2rem; font-weight: 700; margin: 0 0 .6rem;\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;\n}\n.done-subtitle { font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin: 0 0 2.2rem; max-width: 360px; margin-left: auto; margin-right: auto; }\n.done-stats-card { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.8rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }\n.done-stats-label { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .09em; font-weight: 600; }\n.done-time-value { font-size: 3.2rem; font-weight: 700; color: var(--accent-1); line-height: 1; }\n.done-time-unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; margin-left: .2rem; }\n.done-progress-row { width: 100%; }\n.done-progress-meta { display: flex; justify-content: space-between; font-size: .72rem; color: var(--text-dim); margin-bottom: .4rem; }\n.done-badges { display: flex; gap: .7rem; flex-wrap: wrap; justify-content: center; }\n.done-badge { display: inline-flex; align-items: center; gap: .35rem; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 100px; font-size: .78rem; padding: .3rem .85rem; color: var(--text-muted); }\n.done-badge.ok   { border-color: rgba(94,231,160,.3); color: var(--accent-ok); background: rgba(94,231,160,.08); }\n.done-badge.warn { border-color: rgba(255,190,85,.3);  color: var(--accent-warn); background: rgba(255,190,85,.08); }\n.done-badge.info { border-color: rgba(94,231,223,.3);  color: var(--accent-3); background: rgba(94,231,223,.08); }\n.done-actions { display: flex; gap: .85rem; justify-content: center; flex-wrap: wrap; }\n.done-actions .btn { min-width: 140px; }\n.done-tip { margin-top: 2rem; padding: .9rem 1.1rem; border-radius: var(--radius-md); background: rgba(0,170,255,.07); border: 1px solid rgba(0,170,255,.18); font-size: .82rem; color: var(--text-muted); line-height: 1.55; }\n.done-tip strong { color: var(--accent-1); }": {
+    "file": "learn_done",
+    "text": ".done-wrap { max-width: 480px; margin: 0 auto; padding: 3.5rem 1rem 4rem; text-align: center; }\n.done-emoji { font-size: 5rem; line-height: 1; margin-bottom: 1.2rem; animation: popIn .45s cubic-bezier(.34,1.56,.64,1) both; }\n@keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }\n.done-title {\n  font-size: 2rem; font-weight: 700; margin: 0 0 .6rem;\n  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));\n  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;\n}\n.done-subtitle { font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin: 0 0 2.2rem; max-width: 360px; margin-left: auto; margin-right: auto; }\n.done-stats-card { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.8rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }\n.done-stats-label { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .09em; font-weight: 600; }\n.done-time-value { font-size: 3.2rem; font-weight: 700; color: var(--accent-1); line-height: 1; }\n.done-time-unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; margin-left: .2rem; }\n.done-progress-row { width: 100%; }\n.done-progress-meta { display: flex; justify-content: space-between; font-size: .72rem; color: var(--text-dim); margin-bottom: .4rem; }\n.done-badges { display: flex; gap: .7rem; flex-wrap: wrap; justify-content: center; }\n.done-badge { display: inline-flex; align-items: center; gap: .35rem; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 100px; font-size: .78rem; padding: .3rem .85rem; color: var(--text-muted); }\n.done-badge.ok   { border-color: rgba(94,231,160,.3); color: var(--accent-ok); background: rgba(94,231,160,.08); }\n.done-badge.warn { border-color: rgba(255,190,85,.3);  color: var(--accent-warn); background: rgba(255,190,85,.08); }\n.done-badge.info { border-color: rgba(94,231,223,.3);  color: var(--accent-3); background: rgba(94,231,223,.08); }\n.done-actions { display: flex; gap: .85rem; justify-content: center; flex-wrap: wrap; }\n.done-actions .btn { min-width: 140px; }\n.done-tip { margin-top: 2rem; padding: .9rem 1.1rem; border-radius: var(--radius-md); background: rgba(0,170,255,.07); border: 1px solid rgba(0,170,255,.18); font-size: .82rem; color: var(--text-muted); line-height: 1.55; }\n.done-tip strong { color: var(--accent-1); }"
+  },
+  "Tempo studiato oggi": {
+    "file": "learn_done",
+    "text": "Tempo studiato oggi"
+  },
+  "min": {
+    "file": "learn_done",
+    "text": "min"
+  },
+  "Progresso giornaliero": {
+    "file": "learn_done",
+    "text": "Progresso giornaliero"
+  },
+  "= 50 %}": {
+    "file": "learn_done",
+    "text": "= 50 %}"
+  },
+  "Suggerimento:": {
+    "file": "learn_done",
+    "text": "Suggerimento:"
+  },
+  "Fai il ripasso delle carte già studiate per rinforzare la memoria a lungo termine con l&rsquo;algoritmo SRS.\n    {% elif over_limit %}": {
+    "file": "learn_done",
+    "text": "Fai il ripasso delle carte già studiate per rinforzare la memoria a lungo termine con l&rsquo;algoritmo SRS.\n    {% elif over_limit %}"
+  },
+  "Sapevi che?": {
+    "file": "learn_done",
+    "text": "Sapevi che?"
+  },
+  "Studiare troppo a lungo riduce l&rsquo;efficacia. Torna domani riposato per ottenere risultati migliori!\n    {% else %}": {
+    "file": "learn_done",
+    "text": "Studiare troppo a lungo riduce l&rsquo;efficacia. Torna domani riposato per ottenere risultati migliori!\n    {% else %}"
+  },
+  "Continua così!": {
+    "file": "learn_done",
+    "text": "Continua così!"
+  },
+  "La costanza quotidiana è il segreto per padroneggiare il coreano.\n    {% endif %}": {
+    "file": "learn_done",
+    "text": "La costanza quotidiana è il segreto per padroneggiare il coreano.\n    {% endif %}"
+  }
+}
