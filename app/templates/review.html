@@ -117,7 +117,10 @@
         display:flex; flex-direction:column; align-items:center; justify-content:center;
         min-height: 200px; padding: 2rem;
       ">
-        <div class="card-char" id="card-char-display">{{ card.front }}</div>
+        <div style="position:relative; display:inline-block;">
+          <div class="card-char" id="card-char-display">{{ card.front }}</div>
+          <button type="button" onclick="speakText('{{ card.front }}')" style="position:absolute; top:5px; right:-45px; background:none; border:none; font-size:1.5rem; cursor:pointer; opacity:.7; transition:opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7" title="Ascolta">🔊</button>
+        </div>
         <div id="answer-reveal" style="display:none; text-align:center; margin-top:.5rem;">
           <div style="font-size:1.6rem; font-weight:600; color:var(--accent-3);">{{ card.back }}</div>
           {% if card.romanji %}
@@ -190,6 +193,19 @@
 {% block scripts %}
 <script>
 const CORRECT_ANSWER  = {{ card.back | tojson }};
+
+// ── Audio Helper ──────────────────────────────────────────────
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'ko-KR';
+  utt.rate = 0.85;
+  setTimeout(() => window.speechSynthesis.speak(utt), 100);
+}
+
+// Auto-play on load
+speakText('{{ card.front }}');
 const CORRECT_ROMANJI = {{ (card.romanji or '') | tojson }};
 
 let _cardStart   = Date.now();
