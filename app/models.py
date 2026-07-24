@@ -86,6 +86,7 @@ class UserCard(Base):
     last_reviewed = Column(Date, nullable=True)
 
     is_new = Column(Boolean, default=True)
+    fast_lane = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="user_cards")
     card = relationship("Card", back_populates="user_cards")
