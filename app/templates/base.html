@@ -61,15 +61,15 @@
       <span>Korean</span>
     </a>
     <div class="nav-right">
-      <a href="/learn"        class="btn btn-glass btn-sm" id="nav-learn-btn">🌱 {{ t('base.nav_learn') }}</a>
-      <a href="/review/start" class="btn btn-glass btn-sm" id="nav-review-btn">📚 {{ t('base.nav_review') }}</a>
-      <a href="/zen"          class="btn btn-glass btn-sm" id="nav-zen-btn">🪷 {{ t('base.nav_zen') }}</a>
+      <a href="/learn"        class="btn btn-glass btn-sm" id="nav-learn-btn">🌱 <span class="nav-text">{{ t('base.nav_learn') }}</span></a>
+      <a href="/review/start" class="btn btn-glass btn-sm" id="nav-review-btn">📚 <span class="nav-text">{{ t('base.nav_review') }}</span></a>
+      <a href="/zen"          class="btn btn-glass btn-sm" id="nav-zen-btn">🪷 <span class="nav-text">{{ t('base.nav_zen') }}</span></a>
       <a href="/settings"     class="btn btn-glass btn-sm" id="nav-settings-btn">⚙️</a>
       <span class="nav-name">{{ user.name.split(' ')[0] }}</span>
       {% if user.picture %}
         <img src="{{ user.picture }}" alt="Avatar" class="nav-avatar">
       {% endif %}
-      <a href="/auth/logout" class="btn btn-glass btn-sm" id="nav-logout-btn">{{ t('base.nav_logout') }}</a>
+      <a href="/auth/logout" class="btn btn-glass btn-sm" id="nav-logout-btn">🚪 <span class="nav-text">{{ t('base.nav_logout') }}</span></a>
     </div>
   </nav>
 
