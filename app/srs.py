@@ -543,3 +543,52 @@ def get_zen_word_by_id(word_id: int) -> Optional[dict]:
         if w["id"] == word_id:
             return w
     return None
+
+def fast_track_phase(db: Session, user: User, phase: str) -> None:
+    """Marks all cards in a given phase as learned (srs_stage=2) with an initial interval."""
+    ucs = (
+        db.query(UserCard)
+        .join(Card, UserCard.card_id == Card.id)
+        .filter(UserCard.user_id == user.id, Card.phase == phase)
+        .all()
+    )
+    today = date.today()
+    now = datetime.now()
+    for uc in ucs:
+        if uc.srs_stage < 2:
+            uc.srs_stage = 2
+            uc.is_new = False
+            uc.interval = 5
+            uc.repetitions = 1
+            uc.ease_factor = 2.5
+            uc.last_reviewed = today
+            uc.introduced_date = today
+            uc.due_date = now + timedelta(days=5)
+    db.commit()
+
+def generate_placement_quiz(phase: str, num_questions: int = 5) -> list[dict]:
+    import random
+    if phase == "jamo":
+        data = JAMO_VOWELS_DATA + JAMO_CONSONANTS_DATA
+    else:
+        data = SYLLABLE_BASIC_DATA + SYLLABLE_ADVANCED_DATA
+        
+    if not data:
+        return []
+    
+    questions = random.sample(data, min(num_questions, len(data)))
+    quiz = []
+    all_romaja = list(set([item[2] for item in data]))
+    
+    for i, item in enumerate(questions):
+        correct = item[2]
+        wrong_options = random.sample([r for r in all_romaja if r != correct], 3)
+        options = [correct] + wrong_options
+        random.shuffle(options)
+        quiz.append({
+            "id": i,
+            "char": item[0],
+            "answer": correct,
+            "options": options
+        })
+    return quiz

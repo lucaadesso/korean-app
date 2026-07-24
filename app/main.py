@@ -442,28 +442,79 @@ async def settings_page(request: Request, db: Session = Depends(get_db)):
 
 
 @app.post("/settings", response_class=HTMLResponse)
-async def save_settings(request: Request, db: Session = Depends(get_db)):
-    user = require_user(request, db)
+async def update_settings(request: Request, db: Session = Depends(get_db)):
+    user = await get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/", status_code=303)
+    
     form = await request.form()
-
-    # Parse and validate inputs
     try:
         minutes = int(form.get("target_daily_minutes", 20))
-        minutes = max(5, min(120, minutes))   # clamp 5–120 min
-    except (ValueError, TypeError):
-        minutes = 20
-
-    try:
         new_cards = int(form.get("target_daily_new_cards", 5))
-        new_cards = max(1, min(20, new_cards))
-    except (ValueError, TypeError):
+        if minutes < 5: minutes = 5
+        if minutes > 120: minutes = 120
+        if new_cards < 1: new_cards = 1
+        if new_cards > 50: new_cards = 50
+    except ValueError:
+        minutes = 20
         new_cards = 5
-
-    strict = form.get("strict_mode") == "1"
-
+        
     user.target_daily_minutes   = minutes
     user.target_daily_new_cards = new_cards
-    user.strict_mode            = strict
     db.commit()
+    return RedirectResponse(url="/dashboard", status_code=303)
 
-    return RedirectResponse(url="/settings?saved=1", status_code=303)
+
+# ─── Placement Test ──────────────────────────────────────────────────────────
+
+@app.get("/placement", response_class=HTMLResponse)
+async def placement_test(request: Request, db: Session = Depends(get_db)):
+    user = await get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/", status_code=303)
+    
+    # Store quiz data in session so we can validate it
+    jamo_quiz = srs.generate_placement_quiz("jamo", 5)
+    syllable_quiz = srs.generate_placement_quiz("syllable", 5)
+    
+    request.session["placement_quiz"] = {
+        "jamo": [{"id": q["id"], "answer": q["answer"]} for q in jamo_quiz],
+        "syllable": [{"id": q["id"], "answer": q["answer"]} for q in syllable_quiz]
+    }
+    
+    return templates.TemplateResponse("placement.html", {
+        "request": request,
+        "jamo_quiz": jamo_quiz,
+        "syllable_quiz": syllable_quiz
+    })
+
+@app.post("/placement/submit", response_class=HTMLResponse)
+async def submit_placement(request: Request, db: Session = Depends(get_db)):
+    user = await get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/", status_code=303)
+    
+    form = await request.form()
+    quiz_data = request.session.get("placement_quiz", {})
+    if not quiz_data:
+        return RedirectResponse(url="/dashboard", status_code=303)
+    
+    # Evaluate Jamo
+    j_correct = 0
+    for q in quiz_data.get("jamo", []):
+        if form.get(f"j_{q['id']}") == q["answer"]:
+            j_correct += 1
+            
+    # Evaluate Syllable
+    s_correct = 0
+    for q in quiz_data.get("syllable", []):
+        if form.get(f"s_{q['id']}") == q["answer"]:
+            s_correct += 1
+            
+    # If >= 4/5, fast track
+    if j_correct >= 4:
+        srs.fast_track_phase(db, user, "jamo")
+    if s_correct >= 4:
+        srs.fast_track_phase(db, user, "syllable")
+        
+    return RedirectResponse(url="/dashboard", status_code=303)

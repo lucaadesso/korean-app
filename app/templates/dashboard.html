@@ -140,7 +140,18 @@
     </div>
   </div>
 
-  {% if user.active_days_this_month <= 2 and (not due_count) and new_today > 0 %}
+  {% if user.active_days_this_month <= 2 and jamo.phase.pct_learned == 0 %}
+  <!-- Placement Test Banner -->
+  <div class="alert alert-warn" style="margin-bottom:1.5rem; display:flex; gap:1rem; align-items:center; justify-content:space-between;">
+    <div>
+      <div style="font-weight:700; margin-bottom:.3rem; color:var(--text-primary);">Hai già studiato in passato?</div>
+      <div style="font-size:.85rem; color:var(--text-muted);">
+        Fai il test di posizionamento per saltare le basi che già conosci e configurare subito il tuo profilo.
+      </div>
+    </div>
+    <a href="/placement" class="btn btn-primary" style="white-space:nowrap;">Inizia il Test</a>
+  </div>
+  {% elif user.active_days_this_month <= 2 and (not due_count) and new_today > 0 %}
   <!-- Onboarding Tip -->
   <div class="alert alert-info" style="margin-bottom:1.5rem; border-color:var(--accent-1); display:flex; gap:1rem; align-items:start;">
     <div style="font-size:1.5rem;">🧠</div>

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Placement Test — 한국어{% endblock %}
+
+{% block head %}
+<style>
+.quiz-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-glow);
+}
+.question {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(255,255,255,.03);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,.05);
+}
+.char-display {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 3.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--accent-1);
+}
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .8rem;
+}
+.option-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: .8rem;
+  cursor: pointer;
+  transition: all .2s;
+  font-weight: 600;
+}
+.option-label:hover {
+  border-color: var(--accent-2);
+  background: rgba(255,255,255,.1);
+}
+input[type="radio"] {
+  display: none;
+}
+input[type="radio"]:checked + .option-label {
+  background: var(--accent-1);
+  color: #fff;
+  border-color: var(--accent-1);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-sm">
+  <div class="quiz-container">
+    <div style="text-align:center; margin-bottom:2rem;">
+      <h1 style="font-size:1.8rem; font-weight:700; margin-bottom:.5rem;">Test di Posizionamento</h1>
+      <p style="color:var(--text-muted);">Dimostra cosa sai già per saltare le basi!</p>
+    </div>
+
+    <form method="POST" action="/placement/submit">
+      
+      <!-- Jamo Section -->
+      <h2 style="font-size:1.2rem; margin-bottom:1rem; color:var(--text-primary); border-bottom:1px solid var(--border); padding-bottom:.5rem;">Sezione 1: Jamo (Vocali & Consonanti)</h2>
+      {% for q in jamo_quiz %}
+      <div class="question">
+        <div class="char-display">{{ q.char }}</div>
+        <div class="options-grid">
+          {% for opt in q.options %}
+          <label>
+            <input type="radio" name="j_{{ q.id }}" value="{{ opt }}" required>
+            <div class="option-label">{{ opt }}</div>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Syllable Section -->
+      <h2 style="font-size:1.2rem; margin-bottom:1rem; color:var(--text-primary); border-bottom:1px solid var(--border); padding-bottom:.5rem; margin-top:3rem;">Sezione 2: Sillabe</h2>
+      {% for q in syllable_quiz %}
+      <div class="question">
+        <div class="char-display">{{ q.char }}</div>
+        <div class="options-grid">
+          {% for opt in q.options %}
+          <label>
+            <input type="radio" name="s_{{ q.id }}" value="{{ opt }}" required>
+            <div class="option-label">{{ opt }}</div>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+
+      <div style="text-align:center; margin-top:2.5rem;">
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Valuta il mio livello</button>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
