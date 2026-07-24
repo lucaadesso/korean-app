@@ -443,7 +443,7 @@ async def settings_page(request: Request, db: Session = Depends(get_db)):
 
 @app.post("/settings", response_class=HTMLResponse)
 async def update_settings(request: Request, db: Session = Depends(get_db)):
-    user = await get_current_user(request, db)
+    user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/", status_code=303)
     
@@ -469,7 +469,7 @@ async def update_settings(request: Request, db: Session = Depends(get_db)):
 
 @app.get("/placement", response_class=HTMLResponse)
 async def placement_test(request: Request, db: Session = Depends(get_db)):
-    user = await get_current_user(request, db)
+    user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/", status_code=303)
     
@@ -490,7 +490,7 @@ async def placement_test(request: Request, db: Session = Depends(get_db)):
 
 @app.post("/placement/submit", response_class=HTMLResponse)
 async def submit_placement(request: Request, db: Session = Depends(get_db)):
-    user = await get_current_user(request, db)
+    user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/", status_code=303)
     
