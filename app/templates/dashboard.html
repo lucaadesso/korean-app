@@ -125,7 +125,7 @@
       {% if learn_count > 0 %}
       <a href="/learn" class="btn btn-primary btn-lg" id="start-learn-btn">
         🌱 {{ t('dashboard.impara') }}
-        <span style="background:rgba(255,255,255,.25); border-radius:100px; padding:.1rem .5rem; font-size:.8rem; margin-left:.3rem;">{{ learn_count }} nuove</span>
+        <span style="background:rgba(255,255,255,.25); border-radius:100px; padding:.1rem .5rem; font-size:.8rem; margin-left:.3rem;">{{ learn_count }} {{ t('dashboard.new') }}</span>
       </a>
       {% endif %}
       {% if due_count > 0 %}
@@ -149,16 +149,16 @@
         {{ t('dashboard.placement_desc') }}
       </div>
     </div>
-    <a href="/placement" class="btn btn-primary" style="white-space:nowrap;">Inizia il Test</a>
+    <a href="/placement" class="btn btn-primary" style="white-space:nowrap;">{{ t('dashboard.start_test') }}</a>
   </div>
   {% elif user.active_days_this_month <= 2 and (not due_count) and new_today > 0 %}
   <!-- Onboarding Tip -->
   <div class="alert alert-info" style="margin-bottom:1.5rem; border-color:var(--accent-1); display:flex; gap:1rem; align-items:start;">
     <div style="font-size:1.5rem;">🧠</div>
     <div>
-      <div style="font-weight:700; margin-bottom:.3rem; color:var(--text-primary);">Perché imparo così poco all'inizio?</div>
+      <div style="font-weight:700; margin-bottom:.3rem; color:var(--text-primary);">{{ t('dashboard.why_learn_little_title') }}</div>
       <div style="font-size:.85rem; color:var(--text-muted);">
-        Il nostro algoritmo SRS limita di proposito l'introduzione di nuovi concetti a <strong>pochi caratteri al giorno</strong>. Questo evita il sovraccarico cognitivo e favorisce una memorizzazione a lungo termine. Una volta introdotti, i caratteri riappariranno per un ripasso dopo 10 minuti. Non preoccuparti, il ritmo accelererà naturalmente nei prossimi giorni!
+        {{ t('dashboard.why_learn_little_desc') | safe }}
       </div>
     </div>
   </div>
@@ -167,11 +167,11 @@
   <!-- ── Study-time bar ─────────────────────────────────── -->
   <div style="background:var(--bg-glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem 1.4rem; margin-bottom:1.5rem;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem; font-size:.85rem;">
-      <span style="color:var(--text-muted); font-weight:500;">⏱️ Tempo di studio oggi</span>
+      <span style="color:var(--text-muted); font-weight:500;">⏱️ {{ t('dashboard.study_time_today') }}</span>
       <div style="display:flex; align-items:center; gap:.6rem;">
         <span id="time-value" style="font-weight:700;">{{ ts.minutes_studied }} min</span>
         <span style="color:var(--text-dim); font-size:.75rem;">/ {{ ts.target_daily_minutes }} min</span>
-        <a href="/settings" style="color:var(--text-dim); font-size:.7rem; text-decoration:none;" title="Modifica obiettivo">⚙️</a>
+        <a href="/settings" style="color:var(--text-dim); font-size:.7rem; text-decoration:none;" title="{{ t('dashboard.edit_target') }}">⚙️</a>
       </div>
     </div>
     <div class="progress-track">
@@ -188,16 +188,16 @@
   <!-- ── Quick stats ────────────────────────────────────── -->
   <div class="stats-grid" style="margin-bottom:1.5rem;">
     <div class="stat-card" style="text-align:center;">
-      <div class="stat-label">🌟 Giorni Attivi</div>
+      <div class="stat-label">🌟 {{ t('dashboard.active_days') }}</div>
       <div class="active-days-ring" style="margin:.8rem auto .4rem;">
-        <span class="num color-blue">{{ user.active_days_this_month }}</span>
-        <span class="sub">questo mese</span>
+        <span class="num color-violet">{{ user.active_days_this_month }}</span>
+        <span class="sub">{{ t('dashboard.this_month') }}</span>
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">🌱 Imparate oggi</div>
+      <div class="stat-label">🌱 {{ t('dashboard.learned_today') }}</div>
       <div class="stat-value color-teal">{{ new_today }} / {{ max_new }}</div>
-      <div class="stat-sub">carte introdotte</div>
+      <div class="stat-sub">{{ t('dashboard.cards_introduced') }}</div>
       {% if learned_today_cards %}
       <div style="display:flex; flex-wrap:wrap; gap:.25rem; margin-top:.6rem; justify-content:center;">
         {% for c in learned_today_cards %}
@@ -213,18 +213,18 @@
         {% endfor %}
       </div>
       {% else %}
-      <div style="font-size:.72rem; color:var(--text-dim); margin-top:.4rem;">Nessuna carta introdotta oggi</div>
+      <div style="font-size:.72rem; color:var(--text-dim); margin-top:.4rem;">{{ t('dashboard.no_cards_today') }}</div>
       {% endif %}
     </div>
     <div class="stat-card">
-      <div class="stat-label">📚 Da Ripassare</div>
-      <div class="stat-value color-red">{{ due_count }}</div>
-      <div class="stat-sub">max 25/giorno</div>
+      <div class="stat-label">📚 {{ t('dashboard.to_review') }}</div>
+      <div class="stat-value color-pink">{{ due_count }}</div>
+      <div class="stat-sub">{{ t('dashboard.max_25_day') }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">📊 Jamo</div>
-      <div class="stat-value color-blue">{{ progress.jamo.phase.pct_learned }}%</div>
-      <div class="stat-sub">{{ progress.jamo.phase.learned }}/{{ progress.jamo.phase.total }} appresi</div>
+      <div class="stat-value color-violet">{{ progress.jamo.phase.pct_learned }}%</div>
+      <div class="stat-sub">{{ progress.jamo.phase.learned }}/{{ progress.jamo.phase.total }} {{ t('dashboard.learned') }}</div>
       <div class="mini-bar" style="margin-top:.6rem;">
         <div class="mini-fill{% if progress.jamo.phase.pct_learned == 100 %} done{% endif %}"
              style="width:{{ progress.jamo.phase.pct_learned }}%"></div>
@@ -256,7 +256,7 @@
       {% for g in progress.jamo.groups %}
         {% set is_current = current_group and current_group.phase == 'jamo' and current_group.group == g.group %}
         {% set tile_class = 'complete' if g.complete else ('active' if is_current else 'locked') %}
-        <div class="group-tile {{ tile_class }}" title="{{ g.learned }}/{{ g.total }} appresi">
+        <div class="group-tile {{ tile_class }}" title="{{ g.learned }}/{{ g.total }} {{ t('dashboard.learned') }}">
           <div class="group-tile-label">{{ g.group }}</div>
           <div class="group-tile-chars">{{ JAMO_CHARS.get(g.group, '') }}</div>
           <div class="group-tile-pct {% if g.complete %}pct-green{% elif is_current %}pct-blue{% else %}pct-dim{% endif %}">
@@ -271,8 +271,8 @@
     </div>
     {% if progress.current_learn and progress.current_learn.phase == 'jamo' %}
     <div style="margin-top:.8rem; font-size:.82rem; color:var(--text-muted);">
-      ▶ Gruppo corrente: <strong style="color:var(--accent-1);">{{ progress.current_learn.group }}</strong>
-      — {{ progress.current_learn.progress.learned }}/{{ progress.current_learn.progress.total }} appresi
+      ▶ {{ t('dashboard.current_group') }}: <strong style="color:var(--accent-1);">{{ progress.current_learn.group }}</strong>
+      — {{ progress.current_learn.progress.learned }}/{{ progress.current_learn.progress.total }} {{ t('dashboard.learned') }}
     </div>
     {% endif %}
   </div>
@@ -286,7 +286,7 @@
       {% if progress.syllable.unlocked %}
       <span class="phase-pct">{{ progress.syllable.phase.learned }}/{{ progress.syllable.phase.total }} — {{ progress.syllable.phase.pct_learned }}%</span>
       {% else %}
-      <span class="locked-badge">🔒 Sblocca all'80% Jamo (ora {{ progress.jamo.phase.pct_learned }}%)</span>
+      <span class="locked-badge">🔒 {{ t('dashboard.unlock_at_80_jamo', pct=progress.jamo.phase.pct_learned) }}</span>
       {% endif %}
     </div>
     {% if progress.syllable.unlocked %}
@@ -325,11 +325,11 @@
   ═══════════════════════════════════════════════════════ -->
   <div class="phase-section" style="opacity:.4;">
     <div class="phase-header">
-      <div class="phase-title">📖 Vocaboli & Frasi</div>
-      <span class="locked-badge">🔒 Disponibile dopo le Sillabe</span>
+      <div class="phase-title">📖 {{ t('dashboard.vocab_words') }}</div>
+      <span class="locked-badge">🔒 {{ t('dashboard.vocab_words_locked') }}</span>
     </div>
     <div style="background:var(--bg-glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem 1.4rem; font-size:.85rem; color:var(--text-dim);">
-      300-500 parole ad alta frequenza + espressioni quotidiane. Sbloccato quando Jamo e Sillabe sono completati.
+      {{ t('dashboard.vocab_words_desc') }}
     </div>
   </div>
 

@@ -507,5 +507,13 @@ nav {
   .container, .container-sm { padding: 1.5rem 1rem; }
   .card-char { font-size: 4.5rem; }
   .quality-btns { grid-template-columns: repeat(2,1fr); }
-  nav { padding: .7rem 1rem; }
+  nav { padding: .7rem .8rem; flex-wrap: wrap; gap: .5rem; }
+  .nav-right { flex-wrap: wrap; justify-content: center; width: 100%; gap: .5rem; }
+  .btn { padding: .5rem 1rem; font-size: .85rem; }
+  .nav-name { display: none; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .btn-lg { padding: .7rem 1.2rem; }
 }

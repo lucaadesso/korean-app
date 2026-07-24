@@ -61,15 +61,15 @@
       <span>Korean</span>
     </a>
     <div class="nav-right">
-      <a href="/learn"        class="btn btn-glass btn-sm" id="nav-learn-btn">🌱 Impara</a>
-      <a href="/review/start" class="btn btn-glass btn-sm" id="nav-review-btn">📚 Ripassa</a>
-      <a href="/zen"          class="btn btn-glass btn-sm" id="nav-zen-btn">🪷 Zen</a>
+      <a href="/learn"        class="btn btn-glass btn-sm" id="nav-learn-btn">🌱 {{ t('base.nav_learn') }}</a>
+      <a href="/review/start" class="btn btn-glass btn-sm" id="nav-review-btn">📚 {{ t('base.nav_review') }}</a>
+      <a href="/zen"          class="btn btn-glass btn-sm" id="nav-zen-btn">🪷 {{ t('base.nav_zen') }}</a>
       <a href="/settings"     class="btn btn-glass btn-sm" id="nav-settings-btn">⚙️</a>
       <span class="nav-name">{{ user.name.split(' ')[0] }}</span>
       {% if user.picture %}
         <img src="{{ user.picture }}" alt="Avatar" class="nav-avatar">
       {% endif %}
-      <a href="/auth/logout" class="btn btn-glass btn-sm" id="nav-logout-btn">Esci</a>
+      <a href="/auth/logout" class="btn btn-glass btn-sm" id="nav-logout-btn">{{ t('base.nav_logout') }}</a>
     </div>
   </nav>
 
@@ -78,21 +78,20 @@
     <div class="softcap-card">
       <div style="font-size:3rem; margin-bottom:.8rem;">🎯</div>
       <h2 id="softcap-title" style="font-size:1.35rem; font-weight:700; margin-bottom:.6rem;">
-        Obiettivo del giorno raggiunto!
+        {{ t('base.softcap_title') }}
       </h2>
       <p style="color:var(--text-muted); font-size:.88rem; margin-bottom:1.6rem; line-height:1.6;">
-        Il cervello impara meglio a piccole dosi. Hai già completato il tuo obiettivo di studio.
-        Vuoi passare alla Zen Mode per consolidare, o continuare comunque?
+        {{ t('base.softcap_desc') }}
       </p>
       <div style="display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap;">
-        <a href="/zen" class="btn btn-primary" id="softcap-zen-btn">🪷 Vai alla Zen Mode</a>
+        <a href="/zen" class="btn btn-primary" id="softcap-zen-btn">🪷 {{ t('base.softcap_zen') }}</a>
         <button class="btn btn-glass" id="softcap-continue-btn" onclick="dismissSoftCap()">
-          Continua comunque →
+          {{ t('base.softcap_continue') }}
         </button>
       </div>
       <div style="margin-top:1rem; font-size:.75rem; color:var(--text-dim);">
-        Puoi cambiare il limite nelle
-        <a href="/settings" style="color:var(--accent-1);">Impostazioni</a>
+        {{ t('base.softcap_change_limit') }}
+        <a href="/settings" style="color:var(--accent-1);">{{ t('base.softcap_settings') }}</a>
       </div>
     </div>
   </div>
