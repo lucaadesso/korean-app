@@ -474,19 +474,12 @@ async def placement_test(request: Request, db: Session = Depends(get_db)):
     if not user:
         return RedirectResponse(url="/", status_code=303)
     
-    # Store quiz data in session so we can validate it
-    jamo_quiz = srs.generate_placement_quiz("jamo", 5)
-    syllable_quiz = srs.generate_placement_quiz("syllable", 5)
-    
-    request.session["placement_quiz"] = {
-        "jamo": [{"id": q["id"], "answer": q["answer"]} for q in jamo_quiz],
-        "syllable": [{"id": q["id"], "answer": q["answer"]} for q in syllable_quiz]
-    }
-    
     return templates.TemplateResponse("placement.html", {
         "request": request,
-        "jamo_quiz": jamo_quiz,
-        "syllable_quiz": syllable_quiz
+        "jamo_groups": srs.JAMO_GROUP_ORDER,
+        "syllable_groups": srs.SYLLABLE_GROUP_ORDER,
+        "j_data": srs.JAMO_DATA,
+        "s_data": srs.SYLLABLE_DATA
     })
 
 @app.post("/placement/submit", response_class=HTMLResponse)
@@ -496,26 +489,13 @@ async def submit_placement(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse(url="/", status_code=303)
     
     form = await request.form()
-    quiz_data = request.session.get("placement_quiz", {})
-    if not quiz_data:
-        return RedirectResponse(url="/dashboard", status_code=303)
     
-    # Evaluate Jamo
-    j_correct = 0
-    for q in quiz_data.get("jamo", []):
-        if form.get(f"j_{q['id']}") == q["answer"]:
-            j_correct += 1
-            
-    # Evaluate Syllable
-    s_correct = 0
-    for q in quiz_data.get("syllable", []):
-        if form.get(f"s_{q['id']}") == q["answer"]:
-            s_correct += 1
-            
-    # If >= 4/5, fast track
-    if j_correct >= 4:
-        srs.fast_track_phase(db, user, "jamo")
-    if s_correct >= 4:
-        srs.fast_track_phase(db, user, "syllable")
+    j_idx = int(form.get("jamo_max_idx", -1))
+    s_idx = int(form.get("syllable_max_idx", -1))
+    
+    if j_idx >= 0:
+        srs.enable_fast_lane(db, user, "jamo", j_idx)
+    if s_idx >= 0:
+        srs.enable_fast_lane(db, user, "syllable", s_idx)
         
     return RedirectResponse(url="/dashboard", status_code=303)
