@@ -271,9 +271,10 @@
   <div class="pause-text">Sessione in pausa — torna per riprendere</div>
 </div>
 
-<!-- Hidden submit form -->
-<form id="learn-form" method="POST" action="/learn/card/{{ uc.id }}">
-  <input type="hidden" name="time_ms" id="time-ms-input">
+<!-- Form to submit data -->
+<form id="learn-form" method="POST" action="/learn/card/{{ uc.id }}" style="display:none;">
+  <input type="hidden" name="time_ms" id="time-ms-input" value="0">
+  <input type="hidden" name="fast_lane_failed" id="fast_lane_failed" value="false">
 </form>
 
 <div class="learn-wrap">
@@ -314,6 +315,9 @@
     <span class="phase-badge">{{ card.phase }}</span>
     {% if card.group_name %}
     <span class="group-badge">{{ card.group_name }}</span>
+    {% endif %}
+    {% if uc.fast_lane %}
+    <span class="phase-badge" style="background:var(--accent-1); color:#fff;">⚡ Fast-Lane</span>
     {% endif %}
   </div>
 
@@ -501,8 +505,13 @@ function startQuiz() {
   inp.focus();
 }
 
+{% if uc.fast_lane %}
+// Fast-lane: skip study phase immediately
+startQuiz();
+{% else %}
 // Auto-advance after 4 seconds during study phase
 _autoTimer = setTimeout(startQuiz, 4000);
+{% endif %}
 
 // ── Check answer ──────────────────────────────────────────────────
 function checkAnswer() {
@@ -531,6 +540,7 @@ function checkAnswer() {
     // Auto-advance after 0.8s on correct
     setTimeout(submitLearn, 800);
   } else {
+    document.getElementById('fast_lane_failed').value = "true";
     panel.className   = 'bad';
     fMain.textContent = '\u274C Risposta: ' + CORRECT_ANSWER;
     fSub.textContent  = (CORRECT_ROMANJI ? CORRECT_ROMANJI + ' \u2014 ' : '') + 'Hai scritto: "' + val + '"';

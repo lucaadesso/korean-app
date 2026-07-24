@@ -1,111 +1,159 @@
 {% extends "base.html" %}
-
-{% block title %}Placement Test — 한국어{% endblock %}
+{% block title %}Test di Posizionamento Adattivo — 한국어{% endblock %}
 
 {% block head %}
 <style>
-.quiz-container {
-  max-width: 600px;
-  margin: 2rem auto;
+.test-card {
+  max-width: 500px;
+  margin: 3rem auto;
   background: var(--bg-glass);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 2rem;
+  padding: 2.5rem 2rem;
   box-shadow: var(--shadow-glow);
-}
-.question {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: rgba(255,255,255,.03);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255,255,255,.05);
+  text-align: center;
 }
 .char-display {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 3.5rem;
-  text-align: center;
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--text-primary);
   margin-bottom: 1rem;
-  color: var(--accent-1);
 }
-.options-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .8rem;
-}
-.option-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255,255,255,.06);
+.quiz-input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: .8rem;
-  cursor: pointer;
-  transition: all .2s;
-  font-weight: 600;
+  background: rgba(0,0,0,0.2);
+  color: var(--text-primary);
+  margin-bottom: 1rem;
 }
-.option-label:hover {
-  border-color: var(--accent-2);
-  background: rgba(255,255,255,.1);
-}
-input[type="radio"] {
-  display: none;
-}
-input[type="radio"]:checked + .option-label {
-  background: var(--accent-1);
-  color: #fff;
-  border-color: var(--accent-1);
-}
+.quiz-input:focus { outline: none; border-color: var(--accent-1); }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-sm">
-  <div class="quiz-container">
-    <div style="text-align:center; margin-bottom:2rem;">
-      <h1 style="font-size:1.8rem; font-weight:700; margin-bottom:.5rem;">Test di Posizionamento</h1>
-      <p style="color:var(--text-muted);">Dimostra cosa sai già per saltare le basi!</p>
+  <div class="test-card" id="test-container">
+    <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:1rem;" id="phase-label">Preparazione...</div>
+    <div class="char-display" id="char-display">⏳</div>
+    
+    <input type="text" id="answer-input" class="quiz-input" placeholder="Scrivi la lettura (Romaja)..." autocomplete="off">
+    
+    <div style="display:flex; gap:0.5rem; justify-content:center;">
+      <button class="btn btn-glass" onclick="submitAnswer(false)">Non lo so</button>
+      <button class="btn btn-primary" onclick="submitAnswer(true)">Conferma</button>
     </div>
+  </div>
 
+  <div class="test-card" id="result-container" style="display:none;">
+    <h2 style="font-size:1.8rem; margin-bottom:1rem;">Valutazione Completata</h2>
+    <p style="color:var(--text-muted); margin-bottom:2rem;" id="result-text"></p>
+    
     <form method="POST" action="/placement/submit">
-      
-      <!-- Jamo Section -->
-      <h2 style="font-size:1.2rem; margin-bottom:1rem; color:var(--text-primary); border-bottom:1px solid var(--border); padding-bottom:.5rem;">Sezione 1: Jamo (Vocali & Consonanti)</h2>
-      {% for q in jamo_quiz %}
-      <div class="question">
-        <div class="char-display">{{ q.char }}</div>
-        <div class="options-grid">
-          {% for opt in q.options %}
-          <label>
-            <input type="radio" name="j_{{ q.id }}" value="{{ opt }}" required>
-            <div class="option-label">{{ opt }}</div>
-          </label>
-          {% endfor %}
-        </div>
-      </div>
-      {% endfor %}
-
-      <!-- Syllable Section -->
-      <h2 style="font-size:1.2rem; margin-bottom:1rem; color:var(--text-primary); border-bottom:1px solid var(--border); padding-bottom:.5rem; margin-top:3rem;">Sezione 2: Sillabe</h2>
-      {% for q in syllable_quiz %}
-      <div class="question">
-        <div class="char-display">{{ q.char }}</div>
-        <div class="options-grid">
-          {% for opt in q.options %}
-          <label>
-            <input type="radio" name="s_{{ q.id }}" value="{{ opt }}" required>
-            <div class="option-label">{{ opt }}</div>
-          </label>
-          {% endfor %}
-        </div>
-      </div>
-      {% endfor %}
-
-      <div style="text-align:center; margin-top:2.5rem;">
-        <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Valuta il mio livello</button>
-      </div>
+      <input type="hidden" name="jamo_max_idx" id="j_max" value="-1">
+      <input type="hidden" name="syllable_max_idx" id="s_max" value="-1">
+      <button type="submit" class="btn btn-primary btn-lg">Attiva Fast-Lane e Inizia 🚀</button>
     </form>
-
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const jGroups = {{ jamo_groups | tojson }};
+const sGroups = {{ syllable_groups | tojson }};
+const jData = {{ j_data | tojson }};
+const sData = {{ s_data | tojson }};
+
+let currentPhase = 'jamo';
+let currentGroupIdx = 0;
+let currentItem = null;
+
+let jMaxIdx = -1;
+let sMaxIdx = -1;
+
+function normalise(s) { return s.trim().toLowerCase().replace(/\s+/g, ''); }
+
+function getQuestion(phase, groupName) {
+    const data = phase === 'jamo' ? jData : sData;
+    const candidates = data.filter(d => d[3] === groupName); // index 3 is group_name in data tuples
+    if (candidates.length === 0) return null;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function renderQuestion() {
+    const groups = currentPhase === 'jamo' ? jGroups : sGroups;
+    if (currentGroupIdx >= groups.length) {
+        nextPhase();
+        return;
+    }
+    
+    document.getElementById('phase-label').innerText = currentPhase.toUpperCase() + ' - Livello ' + (currentGroupIdx + 1);
+    
+    currentItem = getQuestion(currentPhase, groups[currentGroupIdx]);
+    if (!currentItem) {
+        nextPhase();
+        return;
+    }
+    
+    document.getElementById('char-display').innerText = currentItem[0]; // front
+    const inp = document.getElementById('answer-input');
+    inp.value = '';
+    inp.focus();
+}
+
+function nextPhase() {
+    if (currentPhase === 'jamo') {
+        currentPhase = 'syllable';
+        currentGroupIdx = 0;
+        renderQuestion();
+    } else {
+        finishTest();
+    }
+}
+
+function submitAnswer(attempted) {
+    if (!currentItem) return;
+    
+    const inp = document.getElementById('answer-input').value;
+    const isCorrect = attempted && (normalise(inp) === normalise(currentItem[1]) || normalise(inp) === normalise(currentItem[2]));
+    
+    if (isCorrect) {
+        if (currentPhase === 'jamo') jMaxIdx = currentGroupIdx;
+        if (currentPhase === 'syllable') sMaxIdx = currentGroupIdx;
+        currentGroupIdx++;
+        renderQuestion();
+    } else {
+        // Failed or "I don't know" -> stop phase
+        nextPhase();
+    }
+}
+
+function finishTest() {
+    document.getElementById('test-container').style.display = 'none';
+    document.getElementById('result-container').style.display = 'block';
+    
+    document.getElementById('j_max').value = jMaxIdx;
+    document.getElementById('s_max').value = sMaxIdx;
+    
+    let text = "Basato sulle tue risposte:<br>";
+    if (jMaxIdx === -1) text += "<strong>Jamo:</strong> Principiante Assoluto<br>";
+    else text += `<strong>Jamo:</strong> Livello stimato ${jMaxIdx + 1}/${jGroups.length}<br>`;
+    
+    if (sMaxIdx === -1) text += "<strong>Sillabe:</strong> Principiante Assoluto";
+    else text += `<strong>Sillabe:</strong> Livello stimato ${sMaxIdx + 1}/${sGroups.length}`;
+    
+    document.getElementById('result-text').innerHTML = text;
+}
+
+document.getElementById('answer-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') submitAnswer(true);
+});
+
+// Start
+renderQuestion();
+</script>
 {% endblock %}

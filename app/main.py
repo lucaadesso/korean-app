@@ -188,6 +188,7 @@ async def submit_learn(uc_id: int, request: Request, db: Session = Depends(get_d
     user = require_user(request, db)
     form = await request.form()
     time_ms = int(form.get("time_ms", 0))
+    fast_lane_failed = form.get("fast_lane_failed") == "true"
 
     uc = db.query(UserCard).filter(
         UserCard.id == uc_id, UserCard.user_id == user.id
@@ -195,8 +196,8 @@ async def submit_learn(uc_id: int, request: Request, db: Session = Depends(get_d
     if not uc:
         raise HTTPException(status_code=404, detail="Card not found")
 
-    # Mark as learned (srs_stage=1)
-    srs.mark_card_learned(db, uc)
+    # Mark as learned (srs_stage=1 or 2)
+    srs.mark_card_learned(db, uc, fast_lane_failed=fast_lane_failed)
     seconds = max(1, time_ms // 1000)
     srs.add_study_seconds(db, user, seconds)
     db.commit()

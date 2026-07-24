@@ -214,14 +214,25 @@ def count_new_learned_today(db: Session, user: User) -> int:
     )
 
 
-def mark_card_learned(db: Session, uc: UserCard) -> UserCard:
-    """Mark a UserCard as introduced via Learn (srs_stage=1, is_new=False)."""
+def mark_card_learned(db: Session, uc: UserCard, fast_lane_failed: bool = False) -> UserCard:
+    """Mark a UserCard as introduced via Learn."""
     today = date.today()
-    uc.srs_stage      = 1
     uc.is_new         = False
     uc.last_reviewed  = today
     uc.introduced_date = today          # ← track when this card was first introduced
-    uc.due_date       = datetime.now() + timedelta(minutes=10)
+
+    if getattr(uc, "fast_lane", False) and not fast_lane_failed:
+        # Fast-lane success! Graduate immediately.
+        uc.srs_stage = 2
+        uc.interval = 1
+        uc.repetitions = 1
+        uc.due_date = datetime.now() + timedelta(days=1)
+        uc.fast_lane = False
+    else:
+        uc.srs_stage = 1
+        uc.due_date = datetime.now() + timedelta(minutes=10)
+        uc.fast_lane = False
+
     db.commit()
     db.refresh(uc)
     return uc
@@ -544,26 +555,20 @@ def get_zen_word_by_id(word_id: int) -> Optional[dict]:
             return w
     return None
 
-def fast_track_phase(db: Session, user: User, phase: str) -> None:
-    """Marks all cards in a given phase as learned (srs_stage=2) with an initial interval."""
+def enable_fast_lane(db: Session, user: User, phase: str, max_group_index: int) -> None:
+    """Enables fast lane for cards up to the specified group index in a given phase."""
+    groups = JAMO_GROUP_ORDER if phase == "jamo" else SYLLABLE_GROUP_ORDER
+    allowed_groups = groups[:max_group_index + 1]
+    
     ucs = (
         db.query(UserCard)
         .join(Card, UserCard.card_id == Card.id)
-        .filter(UserCard.user_id == user.id, Card.phase == phase)
+        .filter(UserCard.user_id == user.id, Card.phase == phase, Card.group_name.in_(allowed_groups))
         .all()
     )
-    today = date.today()
-    now = datetime.now()
     for uc in ucs:
-        if uc.srs_stage < 2:
-            uc.srs_stage = 2
-            uc.is_new = False
-            uc.interval = 5
-            uc.repetitions = 1
-            uc.ease_factor = 2.5
-            uc.last_reviewed = today
-            uc.introduced_date = today
-            uc.due_date = now + timedelta(days=5)
+        if uc.srs_stage == 0:
+            uc.fast_lane = True
     db.commit()
 
 def generate_placement_quiz(phase: str, num_questions: int = 5) -> list[dict]:
