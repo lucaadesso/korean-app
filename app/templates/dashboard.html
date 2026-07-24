@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — 한국어{% endblock %}
+
+{% block head %}
+<style>
+/* ── Group progress grid ──────────────────────────────── */
+.phase-section {
+  margin-bottom: 2rem;
+}
+.phase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .8rem;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.phase-title {
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.phase-pct {
+  font-size: .82rem;
+  color: var(--text-muted);
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: .2rem .75rem;
+}
+.locked-badge {
+  font-size: .72rem;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: .2rem .75rem;
+  color: var(--text-dim);
+}
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: .6rem;
+}
+.group-tile {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: .7rem .5rem;
+  text-align: center;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.group-tile::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  transition: width .5s ease;
+}
+.group-tile.complete { border-color: rgba(94,231,160,.4); }
+.group-tile.complete::after { width: 100%; background: var(--accent-ok); }
+.group-tile.active  { border-color: rgba(0,170,255,.4); box-shadow: 0 0 14px rgba(0,170,255,.2); }
+.group-tile.active:hover  { transform: translateY(-3px); }
+.group-tile.locked  { opacity: .35; }
+
+.group-tile-chars {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: .25rem;
+  line-height: 1.2;
+  letter-spacing: .04em;
+}
+.group-tile-label {
+  font-size: .62rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  margin-bottom: .3rem;
+}
+.group-tile-pct {
+  font-size: .78rem;
+  font-weight: 700;
+}
+.pct-green  { color: var(--accent-ok); }
+.pct-blue   { color: var(--accent-1); }
+.pct-dim    { color: var(--text-dim); }
+
+/* group mini progress bar */
+.mini-bar {
+  height: 3px;
+  background: rgba(255,255,255,.07);
+  border-radius: 100px;
+  margin-top: .35rem;
+  overflow: hidden;
+}
+.mini-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--accent-3), var(--accent-1));
+  transition: width .6s ease;
+}
+.mini-fill.done { background: var(--accent-ok); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- ── Greeting ─────────────────────────────────────────── -->
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <h1 style="font-size:1.7rem; font-weight:700; margin-bottom:.2rem;">
+        안녕하세요, {{ user.name.split(' ')[0] }}님! 👋
+      </h1>
+      <p style="color:var(--text-muted); font-size:.9rem;">Pronti per studiare il coreano?</p>
+    </div>
+    <div style="display:flex; gap:.7rem; flex-wrap:wrap;">
+      {% if learn_count > 0 %}
+      <a href="/learn" class="btn btn-primary btn-lg" id="start-learn-btn">
+        🌱 Impara
+        <span style="background:rgba(255,255,255,.25); border-radius:100px; padding:.1rem .5rem; font-size:.8rem; margin-left:.3rem;">{{ learn_count }} nuove</span>
+      </a>
+      {% endif %}
+      {% if due_count > 0 %}
+      <a href="/review/start" class="btn btn-glass btn-lg" id="start-review-btn">
+        📚 Ripassa
+        <span style="background:rgba(255,255,255,.12); border-radius:100px; padding:.1rem .5rem; font-size:.8rem; margin-left:.3rem;">{{ due_count }}</span>
+      </a>
+      {% endif %}
+      {% if learn_count == 0 and due_count == 0 %}
+      <a href="/zen" class="btn btn-glass btn-lg" id="goto-zen-btn">🪷 Zen Mode</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── Study-time bar ─────────────────────────────────── -->
+  <div style="background:var(--bg-glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem 1.4rem; margin-bottom:1.5rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem; font-size:.85rem;">
+      <span style="color:var(--text-muted); font-weight:500;">⏱️ Tempo di studio oggi</span>
+      <div style="display:flex; align-items:center; gap:.6rem;">
+        <span id="time-value" style="font-weight:700;">{{ ts.minutes_studied }} min</span>
+        <span style="color:var(--text-dim); font-size:.75rem;">/ {{ ts.target_daily_minutes }} min</span>
+        <a href="/settings" style="color:var(--text-dim); font-size:.7rem; text-decoration:none;" title="Modifica obiettivo">⚙️</a>
+      </div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill{% if ts.over_target %} full{% elif ts.over_soft %} warn{% endif %}"
+           id="time-fill" style="width:{{ ts.pct_target }}%"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:.7rem; color:var(--text-dim); margin-top:.3rem;">
+      <span>0</span>
+      <span>⚡ {{ (ts.target_daily_minutes * 0.75) | int }} min</span>
+      <span>🎯 {{ ts.target_daily_minutes }} min</span>
+    </div>
+  </div>
+
+  <!-- ── Quick stats ────────────────────────────────────── -->
+  <div class="stats-grid" style="margin-bottom:1.5rem;">
+    <div class="stat-card" style="text-align:center;">
+      <div class="stat-label">🌟 Giorni Attivi</div>
+      <div class="active-days-ring" style="margin:.8rem auto .4rem;">
+        <span class="num color-blue">{{ user.active_days_this_month }}</span>
+        <span class="sub">questo mese</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">🌱 Imparate oggi</div>
+      <div class="stat-value color-teal">{{ new_today }} / {{ max_new }}</div>
+      <div class="stat-sub">carte introdotte</div>
+      {% if learned_today_cards %}
+      <div style="display:flex; flex-wrap:wrap; gap:.25rem; margin-top:.6rem; justify-content:center;">
+        {% for c in learned_today_cards %}
+        <span style="
+          font-family:'Noto Sans KR',sans-serif;
+          font-size:1.1rem;
+          background: rgba(94,231,223,.12);
+          border: 1px solid rgba(94,231,223,.25);
+          border-radius: 8px;
+          padding: .15rem .4rem;
+          color: var(--accent-3);
+        " title="{{ c.back }}">{{ c.front }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="font-size:.72rem; color:var(--text-dim); margin-top:.4rem;">Nessuna carta introdotta oggi</div>
+      {% endif %}
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">📚 Da Ripassare</div>
+      <div class="stat-value color-red">{{ due_count }}</div>
+      <div class="stat-sub">max 25/giorno</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">📊 Jamo</div>
+      <div class="stat-value color-blue">{{ progress.jamo.phase.pct_learned }}%</div>
+      <div class="stat-sub">{{ progress.jamo.phase.learned }}/{{ progress.jamo.phase.total }} appresi</div>
+      <div class="mini-bar" style="margin-top:.6rem;">
+        <div class="mini-fill{% if progress.jamo.phase.pct_learned == 100 %} done{% endif %}"
+             style="width:{{ progress.jamo.phase.pct_learned }}%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════════════════
+       Jamo Groups
+  ═══════════════════════════════════════════════════════ -->
+  {% set JAMO_CHARS = {
+    'vowels':     'ㅏ ㅑ ㅓ ㅕ ㅗ ㅛ ㅜ ㅠ ㅡ ㅣ',
+    'consonants': 'ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ',
+  } %}
+  {% set SYLLABLE_CHARS = {
+    'basic':    '가 나 다 라 마 바 사 아 자',
+    'advanced': '고 구 기 노 도 모 소 시 미',
+  } %}
+
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🔤 Jamo <span style="font-family:'Noto Sans KR'; color:var(--accent-1);">자모</span></div>
+      <span class="phase-pct">{{ progress.jamo.phase.learned }}/{{ progress.jamo.phase.total }} — {{ progress.jamo.phase.pct_learned }}%</span>
+    </div>
+    <div class="groups-grid">
+      {% set current_group = progress.current_learn %}
+      {% for g in progress.jamo.groups %}
+        {% set is_current = current_group and current_group.phase == 'jamo' and current_group.group == g.group %}
+        {% set tile_class = 'complete' if g.complete else ('active' if is_current else 'locked') %}
+        <div class="group-tile {{ tile_class }}" title="{{ g.learned }}/{{ g.total }} appresi">
+          <div class="group-tile-label">{{ g.group }}</div>
+          <div class="group-tile-chars">{{ JAMO_CHARS.get(g.group, '') }}</div>
+          <div class="group-tile-pct {% if g.complete %}pct-green{% elif is_current %}pct-blue{% else %}pct-dim{% endif %}">
+            {% if g.complete %}✅{% elif is_current %}{{ g.pct_learned }}%{% else %}🔒{% endif %}
+          </div>
+          <div class="mini-bar">
+            <div class="mini-fill{% if g.complete %} done{% endif %}"
+                 style="width:{{ g.pct_learned }}%"></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    {% if progress.current_learn and progress.current_learn.phase == 'jamo' %}
+    <div style="margin-top:.8rem; font-size:.82rem; color:var(--text-muted);">
+      ▶ Gruppo corrente: <strong style="color:var(--accent-1);">{{ progress.current_learn.group }}</strong>
+      — {{ progress.current_learn.progress.learned }}/{{ progress.current_learn.progress.total }} appresi
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       Syllable Groups
+  ═══════════════════════════════════════════════════════ -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🎌 Sillabe <span style="font-family:'Noto Sans KR'; color:var(--accent-2);">음절</span></div>
+      {% if progress.syllable.unlocked %}
+      <span class="phase-pct">{{ progress.syllable.phase.learned }}/{{ progress.syllable.phase.total }} — {{ progress.syllable.phase.pct_learned }}%</span>
+      {% else %}
+      <span class="locked-badge">🔒 Sblocca all'80% Jamo (ora {{ progress.jamo.phase.pct_learned }}%)</span>
+      {% endif %}
+    </div>
+    {% if progress.syllable.unlocked %}
+    <div class="groups-grid">
+      {% for g in progress.syllable.groups %}
+        {% set is_current = progress.current_learn and progress.current_learn.phase == 'syllable' and progress.current_learn.group == g.group %}
+        {% set tile_class = 'complete' if g.complete else ('active' if is_current else 'locked') %}
+        <div class="group-tile {{ tile_class }}">
+          <div class="group-tile-label">{{ g.group }}</div>
+          <div class="group-tile-chars">{{ SYLLABLE_CHARS.get(g.group, '') }}</div>
+          <div class="group-tile-pct {% if g.complete %}pct-green{% elif is_current %}pct-blue{% else %}pct-dim{% endif %}">
+            {% if g.complete %}✅{% elif is_current %}{{ g.pct_learned }}%{% else %}🔒{% endif %}
+          </div>
+          <div class="mini-bar">
+            <div class="mini-fill{% if g.complete %} done{% endif %}"
+                 style="width:{{ g.pct_learned }}%"></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="groups-grid" style="opacity:.3; pointer-events:none;">
+      {% for g in progress.syllable.groups %}
+      <div class="group-tile locked">
+        <div class="group-tile-label">{{ g.group }}</div>
+        <div class="group-tile-chars" style="font-family:'Noto Sans KR';">{{ SYLLABLE_CHARS.get(g.group, '') }}</div>
+        <div class="group-tile-pct pct-dim">🔒</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       Vocaboli / Frasi (locked)
+  ═══════════════════════════════════════════════════════ -->
+  <div class="phase-section" style="opacity:.4;">
+    <div class="phase-header">
+      <div class="phase-title">📖 Vocaboli & Frasi</div>
+      <span class="locked-badge">🔒 Disponibile dopo le Sillabe</span>
+    </div>
+    <div style="background:var(--bg-glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem 1.4rem; font-size:.85rem; color:var(--text-dim);">
+      300-500 parole ad alta frequenza + espressioni quotidiane. Sbloccato quando Jamo e Sillabe sono completati.
+    </div>
+  </div>
+
+  <!-- ── Actions ───────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div style="display:flex; gap:.8rem; flex-wrap:wrap;">
+    <a href="/learn"        class="btn btn-glass" id="dash-learn-link">🌱 Impara</a>
+    <a href="/review/start" class="btn btn-glass" id="dash-review-link">📚 Ripassa</a>
+    <a href="/zen"          class="btn btn-glass" id="dash-zen-link">🪷 Zen</a>
+  </div>
+
+</div>
+{% endblock %}

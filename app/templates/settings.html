@@ -1,0 +1,665 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+  /* ── Page layout ─────────────────────────────────────────── */
+  .settings-page {
+    padding: 2rem 0 4rem;
+  }
+
+  .settings-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .settings-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.4rem;
+  }
+
+  .settings-header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  /* ── Success toast ────────────────────────────────────────── */
+  .toast-success {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, rgba(94, 231, 223, 0.18), rgba(94, 231, 223, 0.08));
+    border: 1px solid rgba(94, 231, 223, 0.4);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.2rem;
+    margin-bottom: 2rem;
+    color: #5ee7df;
+    font-weight: 600;
+    font-size: 0.95rem;
+    animation: slideDown 0.35s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Section cards ────────────────────────────────────────── */
+  .settings-section {
+    margin-bottom: 1.75rem;
+  }
+
+  .settings-card {
+    border-left: 3px solid var(--accent-1);
+    padding: 1.75rem 1.75rem 1.5rem;
+    border-radius: var(--radius-md);
+  }
+
+  .settings-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Field rows ───────────────────────────────────────────── */
+  .field-row {
+    margin-bottom: 1.75rem;
+  }
+
+  .field-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.85rem;
+  }
+
+  /* ── Range inputs ─────────────────────────────────────────── */
+  .range-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 6px;
+    border-radius: 99px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(
+      to right,
+      var(--accent-1) 0%,
+      var(--accent-1) var(--fill-pct, 50%),
+      rgba(255,255,255,0.12) var(--fill-pct, 50%),
+      rgba(255,255,255,0.12) 100%
+    );
+    transition: background 0.15s ease;
+  }
+
+  .range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent-1);
+    box-shadow: 0 0 0 3px rgba(180, 111, 255, 0.3), 0 2px 8px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .range-input::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 5px rgba(180, 111, 255, 0.25), 0 2px 10px rgba(0,0,0,0.5);
+  }
+
+  .range-input::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent-1);
+    box-shadow: 0 0 0 3px rgba(180, 111, 255, 0.3);
+    cursor: pointer;
+  }
+
+  .range-value {
+    min-width: 70px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--accent-1);
+    background: rgba(180, 111, 255, 0.12);
+    border: 1px solid rgba(180, 111, 255, 0.3);
+    border-radius: 8px;
+    padding: 0.3rem 0.65rem;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  /* ── Preset buttons ───────────────────────────────────────── */
+  .preset-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .preset-btn {
+    padding: 0.35rem 0.9rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+    background: rgba(180, 111, 255, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .preset-btn.active {
+    border-color: var(--accent-1);
+    background: rgba(180, 111, 255, 0.2);
+    color: var(--accent-1);
+  }
+
+  /* ── Divider between fields ───────────────────────────────── */
+  .field-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.75rem 0;
+    opacity: 0.5;
+  }
+
+  /* ── iOS toggle switch ────────────────────────────────────── */
+  .toggle-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .toggle-label-group {
+    flex: 1;
+  }
+
+  .toggle-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+  }
+
+  .toggle-description {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .toggle-track::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .toggle-switch input:checked + .toggle-track {
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+    box-shadow: 0 0 12px rgba(94, 231, 223, 0.35);
+  }
+
+  .toggle-switch input:checked + .toggle-track::before {
+    transform: translateY(-50%) translateX(24px);
+  }
+
+  .toggle-switch input:focus + .toggle-track {
+    outline: 2px solid var(--accent-1);
+    outline-offset: 2px;
+  }
+
+  /* ── Profile section ──────────────────────────────────────── */
+  .profile-row {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+
+  .profile-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-1);
+    box-shadow: 0 0 0 4px rgba(180, 111, 255, 0.15);
+    flex-shrink: 0;
+  }
+
+  .profile-avatar-fallback {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    border: 2px solid rgba(180, 111, 255, 0.5);
+  }
+
+  .profile-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .profile-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .profile-email {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Form actions ─────────────────────────────────────────── */
+  .form-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn-full {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+  }
+
+  /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 540px) {
+    .settings-header h1 {
+      font-size: 1.6rem;
+    }
+
+    .settings-card {
+      padding: 1.25rem 1.1rem 1.1rem;
+    }
+
+    .profile-row {
+      flex-wrap: wrap;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+  <div class="container-sm">
+
+    {# ── Header ───────────────────────────────────────────── #}
+    <div class="settings-header">
+      <h1>⚙️ Impostazioni</h1>
+      <p>Personalizza il tuo percorso di apprendimento</p>
+    </div>
+
+    {# ── Success toast ─────────────────────────────────────── #}
+    {% if saved %}
+    <div class="toast-success" role="alert" aria-live="polite">
+      <span>✅</span>
+      <span>Impostazioni salvate!</span>
+    </div>
+    {% endif %}
+
+    {# ── Main form ─────────────────────────────────────────── #}
+    <form method="POST" action="/settings" id="settings-form">
+
+      {# ── Section 1: Daily goals ──────────────────────────── #}
+      <div class="settings-section">
+        <div class="glass settings-card">
+          <p class="settings-card-title">🎯 Obiettivi giornalieri</p>
+
+          {# — Minutes per day — #}
+          <div class="field-row">
+            <label class="field-label" for="range-minutes">
+              Minuti di studio al giorno
+            </label>
+            <div class="range-wrapper">
+              <input
+                type="range"
+                id="range-minutes"
+                name="target_daily_minutes"
+                class="range-input"
+                min="5"
+                max="60"
+                step="5"
+                value="{{ user.target_daily_minutes }}"
+                oninput="updateRange(this, 'display-minutes', 'min', [10,15,20,30])"
+                aria-valuenow="{{ user.target_daily_minutes }}"
+                aria-valuemin="5"
+                aria-valuemax="60"
+              >
+              <div class="range-value" id="display-minutes">
+                {{ user.target_daily_minutes }} min
+              </div>
+            </div>
+            <div class="preset-group" id="presets-minutes">
+              {% for val in [10, 15, 20, 30] %}
+              <button
+                type="button"
+                class="preset-btn {% if user.target_daily_minutes == val %}active{% endif %}"
+                data-val="{{ val }}"
+                onclick="setPreset('range-minutes', {{ val }}, 'display-minutes', 'min', [10,15,20,30])"
+                aria-label="{{ val }} minuti al giorno"
+              >
+                {{ val }} min
+              </button>
+              {% endfor %}
+            </div>
+          </div>
+
+          <hr class="field-divider">
+
+          {# — New cards per day — #}
+          <div class="field-row">
+            <label class="field-label" for="range-cards">
+              Nuove carte al giorno
+            </label>
+            <div class="range-wrapper">
+              <input
+                type="range"
+                id="range-cards"
+                name="target_daily_new_cards"
+                class="range-input"
+                min="1"
+                max="15"
+                step="1"
+                value="{{ user.target_daily_new_cards }}"
+                oninput="updateRange(this, 'display-cards', 'carte', [3,5,8,10])"
+                aria-valuenow="{{ user.target_daily_new_cards }}"
+                aria-valuemin="1"
+                aria-valuemax="15"
+              >
+              <div class="range-value" id="display-cards">
+                {{ user.target_daily_new_cards }} carte
+              </div>
+            </div>
+            <div class="preset-group" id="presets-cards">
+              {% for val in [3, 5, 8, 10] %}
+              <button
+                type="button"
+                class="preset-btn {% if user.target_daily_new_cards == val %}active{% endif %}"
+                data-val="{{ val }}"
+                onclick="setPreset('range-cards', {{ val }}, 'display-cards', 'carte', [3,5,8,10])"
+                aria-label="{{ val }} carte al giorno"
+              >
+                {{ val }}
+              </button>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {# ── Section 2: Study mode ───────────────────────────── #}
+      <div class="settings-section">
+        <div class="glass settings-card">
+          <p class="settings-card-title">🧠 Modalità di studio</p>
+
+          <div class="field-row">
+            <div class="toggle-row">
+              <div class="toggle-label-group">
+                <div class="toggle-title">Blocco rigido al limite</div>
+                <div class="toggle-description">
+                  Quando <strong>disattivato</strong> (consigliato): raggiunti gli obiettivi,
+                  l'app mostra un avviso gentile ma ti permette di continuare.
+                  Quando <strong>attivato</strong>: reindirizza automaticamente alla Zen Mode.
+                </div>
+              </div>
+              <label class="toggle-switch" aria-label="Attiva blocco rigido">
+                <input
+                  type="checkbox"
+                  name="strict_mode"
+                  value="1"
+                  id="toggle-strict"
+                  {% if user.strict_mode %}checked{% endif %}
+                >
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {# ── Form actions ────────────────────────────────────── #}
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-full">
+          💾 Salva Impostazioni
+        </button>
+        <a href="/" class="btn btn-glass btn-full btn-back">
+          ← Dashboard
+        </a>
+      </div>
+
+    </form>{# /settings-form #}
+
+    {# ── Section 3: Profile (read-only, outside form) ──────── #}
+    <div class="settings-section" style="margin-top: 1.75rem;">
+      <div class="glass settings-card" style="border-left-color: var(--accent-2);">
+        <p class="settings-card-title">👤 Profilo</p>
+
+        <div class="profile-row">
+          {% if user.picture %}
+          <img
+            src="{{ user.picture }}"
+            alt="Avatar di {{ user.name }}"
+            class="profile-avatar"
+            referrerpolicy="no-referrer"
+          >
+          {% else %}
+          <div class="profile-avatar-fallback" aria-hidden="true">
+            {{ user.name[0] | upper if user.name else '?' }}
+          </div>
+          {% endif %}
+
+          <div class="profile-info">
+            <div class="profile-name">{{ user.name }}</div>
+            <div class="profile-email">{{ user.email }}</div>
+          </div>
+
+          <a href="/auth/logout" class="btn btn-glass" style="font-size:0.82rem; padding: 0.4rem 0.9rem; flex-shrink:0;">
+            Disconnetti
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>{# /container-sm #}
+</div>{# /settings-page #}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  /**
+   * Compute a percentage fill for the track gradient.
+   * @param {HTMLInputElement} input
+   */
+  function computeFillPct(input) {
+    const min  = parseFloat(input.min)  || 0;
+    const max  = parseFloat(input.max)  || 100;
+    const val  = parseFloat(input.value);
+    return ((val - min) / (max - min)) * 100;
+  }
+
+  /**
+   * Update the display label and track fill on range change.
+   * @param {HTMLInputElement} input   - The range element
+   * @param {string}           labelId - ID of the value display element
+   * @param {string}           unit    - Unit suffix ("min" | "carte")
+   * @param {number[]}         presets - List of preset values to sync active state
+   */
+  function updateRange(input, labelId, unit, presets) {
+    const val = parseFloat(input.value);
+    const pct = computeFillPct(input);
+
+    // Update track fill
+    input.style.setProperty('--fill-pct', pct + '%');
+
+    // Update ARIA
+    input.setAttribute('aria-valuenow', val);
+
+    // Update display badge
+    const label = document.getElementById(labelId);
+    if (label) {
+      label.textContent = val + ' ' + unit;
+    }
+
+    // Sync preset button active states
+    syncPresets(input.id, val, presets);
+  }
+
+  /**
+   * Sync which preset button appears active.
+   * @param {string}   inputId - ID of the range input
+   * @param {number}   val     - Current value
+   * @param {number[]} presets - List of preset values
+   */
+  function syncPresets(inputId, val, presets) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const fieldRow = input.closest('.field-row');
+    if (!fieldRow) return;
+    const btns = fieldRow.querySelectorAll('.preset-btn');
+    btns.forEach(btn => {
+      const btnVal = parseFloat(btn.getAttribute('data-val'));
+      btn.classList.toggle('active', btnVal === val);
+    });
+  }
+
+  /**
+   * Click on a preset button: update range + display.
+   * @param {string}   inputId - ID of the range input
+   * @param {number}   value   - Value to set
+   * @param {string}   labelId - ID of the display label
+   * @param {string}   unit    - Unit suffix
+   * @param {number[]} presets - List of preset values
+   */
+  function setPreset(inputId, value, labelId, unit, presets) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.value = value;
+    updateRange(input, labelId, unit, presets);
+  }
+
+  /**
+   * Initialise range fills and preset active states on page load.
+   */
+  function initRanges() {
+    const configs = [
+      { inputId: 'range-minutes', labelId: 'display-minutes', unit: 'min',   presets: [10, 15, 20, 30] },
+      { inputId: 'range-cards',   labelId: 'display-cards',   unit: 'carte', presets: [3, 5, 8, 10]    },
+    ];
+
+    configs.forEach(({ inputId, labelId, unit, presets }) => {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      input.style.setProperty('--fill-pct', computeFillPct(input) + '%');
+      syncPresets(inputId, parseFloat(input.value), presets);
+    });
+  }
+
+  /**
+   * Auto-dismiss the success toast after 4 s.
+   */
+  function initToast() {
+    const toast = document.querySelector('.toast-success');
+    if (!toast) return;
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-8px)';
+      setTimeout(() => toast.remove(), 500);
+    }, 4000);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initRanges();
+    initToast();
+  });
+</script>
+{% endblock %}

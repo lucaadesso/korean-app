@@ -1,0 +1,97 @@
+<!-- Zen Word Puzzle — HTMX partial (also included by zen_mode.html) -->
+<div id="zen-word-puzzle"
+     style="background:var(--bg-glass); border:1px solid var(--border); border-radius:24px; padding:1.8rem; text-align:center; animation: fadeSlideIn .35s ease;">
+
+  {% if word %}
+
+  <!-- Korean word -->
+  <div style="
+    font-family:'Noto Sans KR',sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: .5rem;
+    line-height: 1.1;
+  ">{{ word.j }}</div>
+
+  <!-- Meaning -->
+  <div style="font-size:.88rem; color:var(--text-muted); margin-bottom:1.4rem;">
+    🇮🇹 {{ word.m }}
+  </div>
+
+  <!-- Input form — posted to HTMX endpoint -->
+  <form
+    hx-post="/api/zen/word/check/{{ word.id }}"
+    hx-target="#zen-word-puzzle"
+    hx-swap="outerHTML"
+    style="max-width:360px; margin:0 auto;"
+  >
+    <div style="display:flex; gap:.6rem;">
+      <input
+        type="text"
+        name="answer"
+        placeholder="Scrivi la Romaja… (es: gogi)"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        autofocus
+        style="
+          flex:1; padding:.75rem 1rem;
+          border-radius: var(--radius-md);
+          background: rgba(255,255,255,.06);
+          border: 2px solid var(--border);
+          color: var(--text-primary); font-size: 1.05rem;
+          font-family:'Inter',sans-serif;
+          outline:none; transition: border-color .2s, box-shadow .2s;
+        "
+        onfocus="this.style.borderColor='var(--accent-1)'; this.style.boxShadow='0 0 0 3px rgba(0,170,255,.18)'"
+        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+        id="zen-word-answer-input"
+      >
+      <button type="submit" style="
+        padding:.75rem 1.2rem; border-radius:var(--radius-md);
+        background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+        color:#fff; border:none; font-weight:700; font-size:.9rem;
+        cursor:pointer; white-space:nowrap;
+        transition:transform .15s, box-shadow .15s;
+        font-family:'Inter',sans-serif;
+      " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        ✓ Verifica
+      </button>
+    </div>
+  </form>
+
+  <!-- Hint button -->
+  <div style="margin-top:1rem;">
+    <button
+      hx-get="/api/zen/word/hint/{{ word.id }}"
+      hx-target="#zen-word-puzzle"
+      hx-swap="outerHTML"
+      style="
+        padding:.4rem 1rem; border-radius:100px;
+        background:transparent; border:1px solid var(--border);
+        color:var(--text-muted); font-size:.78rem; cursor:pointer;
+        transition:border-color .2s, color .2s;
+        font-family:'Inter',sans-serif;
+      "
+      onmouseover="this.style.borderColor='var(--accent-warn)'; this.style.color='var(--accent-warn)'"
+      onmouseout="this.style.borderColor=''; this.style.color=''"
+      id="zen-hint-btn"
+    >
+      💡 Mostra risposta
+    </button>
+  </div>
+
+  {% else %}
+  <!-- No words available -->
+  <div style="font-size:2rem; margin-bottom:.8rem;">🎉</div>
+  <p style="color:var(--text-muted); font-size:.88rem;">
+    Hai esaurito le parole disponibili. Impara più caratteri per sbloccare nuove parole!
+  </p>
+  <a href="/learn" class="btn btn-glass btn-sm" style="margin-top:1rem;" id="zen-no-words-learn">🌱 Impara</a>
+  {% endif %}
+
+</div>

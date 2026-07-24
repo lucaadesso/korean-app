@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{% block description %}App gamificata per l'apprendimento del coreano con SRS adattivo{% endblock %}">
+  <title>{% block title %}한국어 — Korean Learning{% endblock %}</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.3" defer></script>
+
+  {% block head %}{% endblock %}
+
+  <style>
+  /* ── Soft-cap warning modal ──────────────────────────────── */
+  #softcap-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13,13,20,.82);
+    backdrop-filter: blur(12px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }
+  #softcap-modal.visible { display: flex; }
+  .softcap-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0,170,255,.35);
+    border-radius: var(--radius-xl);
+    padding: 2.2rem 2rem;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(0,170,255,.25);
+    animation: popIn .35s cubic-bezier(.36,.07,.19,.97);
+  }
+  @keyframes popIn {
+    0%   { transform: scale(.85); opacity: 0; }
+    70%  { transform: scale(1.03); }
+    100% { transform: scale(1);   opacity: 1; }
+  }
+  </style>
+</head>
+<body class="page">
+
+  {% if user is defined and user %}
+  <!-- ── Navigation ────────────────────────────────────────── -->
+  <nav>
+    <a href="/dashboard" class="nav-brand">
+      <span class="kr">한</span>
+      <span>Korean</span>
+    </a>
+    <div class="nav-right">
+      <a href="/learn"        class="btn btn-glass btn-sm" id="nav-learn-btn">🌱 Impara</a>
+      <a href="/review/start" class="btn btn-glass btn-sm" id="nav-review-btn">📚 Ripassa</a>
+      <a href="/zen"          class="btn btn-glass btn-sm" id="nav-zen-btn">🪷 Zen</a>
+      <a href="/settings"     class="btn btn-glass btn-sm" id="nav-settings-btn">⚙️</a>
+      <span class="nav-name">{{ user.name.split(' ')[0] }}</span>
+      {% if user.picture %}
+        <img src="{{ user.picture }}" alt="Avatar" class="nav-avatar">
+      {% endif %}
+      <a href="/auth/logout" class="btn btn-glass btn-sm" id="nav-logout-btn">Esci</a>
+    </div>
+  </nav>
+
+  <!-- ── Soft-cap warning modal (shown by JS when over_target) ── -->
+  <div id="softcap-modal" role="dialog" aria-modal="true" aria-labelledby="softcap-title">
+    <div class="softcap-card">
+      <div style="font-size:3rem; margin-bottom:.8rem;">🎯</div>
+      <h2 id="softcap-title" style="font-size:1.35rem; font-weight:700; margin-bottom:.6rem;">
+        Obiettivo del giorno raggiunto!
+      </h2>
+      <p style="color:var(--text-muted); font-size:.88rem; margin-bottom:1.6rem; line-height:1.6;">
+        Il cervello impara meglio a piccole dosi. Hai già completato il tuo obiettivo di studio.
+        Vuoi passare alla Zen Mode per consolidare, o continuare comunque?
+      </p>
+      <div style="display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap;">
+        <a href="/zen" class="btn btn-primary" id="softcap-zen-btn">🪷 Vai alla Zen Mode</a>
+        <button class="btn btn-glass" id="softcap-continue-btn" onclick="dismissSoftCap()">
+          Continua comunque →
+        </button>
+      </div>
+      <div style="margin-top:1rem; font-size:.75rem; color:var(--text-dim);">
+        Puoi cambiare il limite nelle
+        <a href="/settings" style="color:var(--accent-1);">Impostazioni</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+  <script>
+    // ── Study-time heartbeat (pauses when window loses focus) ────
+    {% if user is defined and user %}
+    let _lastSent       = Date.now();
+    let _softCapShown   = sessionStorage.getItem('softCapDismissed') === '1';
+    let _focused        = !document.hidden;
+
+    function _sendAccumulated() {
+      const now   = Date.now();
+      const delta = Math.round((now - _lastSent) / 1000);
+      _lastSent   = now;
+      if (delta < 1) return;
+      fetch('/api/time', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({seconds: delta})
+      }).then(r => r.json()).then(data => {
+        updateTimerUI(data);
+
+        // Soft cap: show modal instead of hard redirect (unless strict_mode)
+        if (data.over_target && !_softCapShown) {
+          if (data.strict_mode) {
+            window.location.href = '/zen';
+          } else {
+            _softCapShown = true;
+            showSoftCapModal();
+          }
+        }
+      }).catch(() => {});
+    }
+
+    function showSoftCapModal() {
+      const m = document.getElementById('softcap-modal');
+      if (m) m.classList.add('visible');
+    }
+
+    function dismissSoftCap() {
+      sessionStorage.setItem('softCapDismissed', '1');
+      const m = document.getElementById('softcap-modal');
+      if (m) m.classList.remove('visible');
+    }
+
+    function _onPause() {
+      if (!_focused) return;
+      _focused = false;
+      _sendAccumulated();
+    }
+    function _onResume() {
+      if (_focused) return;
+      _focused  = true;
+      _lastSent = Date.now();
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      document.hidden ? _onPause() : _onResume();
+    });
+    window.addEventListener('blur',  _onPause);
+    window.addEventListener('focus', _onResume);
+
+    setInterval(() => {
+      if (_focused) _sendAccumulated();
+    }, 10000);
+
+    function updateTimerUI(data) {
+      const fill = document.getElementById('time-fill');
+      const val  = document.getElementById('time-value');
+      if (!fill || !val) return;
+      fill.style.width = (data.pct_target || data.pct_hard) + '%';
+      fill.className   = 'progress-fill' +
+        (data.over_target ? ' full' : data.over_soft ? ' warn' : '');
+      val.textContent  = data.minutes_studied + ' min';
+    }
+    {% endif %}
+  </script>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

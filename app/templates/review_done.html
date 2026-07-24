@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Ripasso Completato — 한국어{% endblock %}
+
+{% block content %}
+<div class="container-sm" style="text-align:center; padding-top:4rem;">
+  <div style="font-size:4rem; margin-bottom:1rem;">✅</div>
+  <h1 style="font-size:1.8rem; font-weight:700; margin-bottom:.6rem;">Ripasso completato!</h1>
+  <p style="color:var(--text-muted); margin-bottom:2rem;">Non hai altre carte da ripassare oggi. Ottimo lavoro!</p>
+  <div style="display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap;">
+    <a href="/dashboard" class="btn btn-primary" id="review-done-dash">← Dashboard</a>
+    <a href="/zen"        class="btn btn-glass"   id="review-done-zen">🪷 Zen Mode</a>
+    <a href="/learn"      class="btn btn-glass"   id="review-done-learn">🌱 Impara</a>
+  </div>
+</div>
+{% endblock %}

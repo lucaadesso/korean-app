@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}{% if congratulate %}Ottimo lavoro!{% elif over_limit %}Limite raggiunto!{% else %}Sessione completata{% endif %} — 한국어{% endblock %}
+{% block description %}Riepilogo della sessione di apprendimento coreano con SRS adattivo{% endblock %}
+
+{% block head %}
+<style>
+.done-wrap { max-width: 480px; margin: 0 auto; padding: 3.5rem 1rem 4rem; text-align: center; }
+.done-emoji { font-size: 5rem; line-height: 1; margin-bottom: 1.2rem; animation: popIn .45s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.done-title {
+  font-size: 2rem; font-weight: 700; margin: 0 0 .6rem;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.done-subtitle { font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin: 0 0 2.2rem; max-width: 360px; margin-left: auto; margin-right: auto; }
+.done-stats-card { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.8rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+.done-stats-label { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .09em; font-weight: 600; }
+.done-time-value { font-size: 3.2rem; font-weight: 700; color: var(--accent-1); line-height: 1; }
+.done-time-unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; margin-left: .2rem; }
+.done-progress-row { width: 100%; }
+.done-progress-meta { display: flex; justify-content: space-between; font-size: .72rem; color: var(--text-dim); margin-bottom: .4rem; }
+.done-badges { display: flex; gap: .7rem; flex-wrap: wrap; justify-content: center; }
+.done-badge { display: inline-flex; align-items: center; gap: .35rem; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 100px; font-size: .78rem; padding: .3rem .85rem; color: var(--text-muted); }
+.done-badge.ok   { border-color: rgba(94,231,160,.3); color: var(--accent-ok); background: rgba(94,231,160,.08); }
+.done-badge.warn { border-color: rgba(255,190,85,.3);  color: var(--accent-warn); background: rgba(255,190,85,.08); }
+.done-badge.info { border-color: rgba(94,231,223,.3);  color: var(--accent-3); background: rgba(94,231,223,.08); }
+.done-actions { display: flex; gap: .85rem; justify-content: center; flex-wrap: wrap; }
+.done-actions .btn { min-width: 140px; }
+.done-tip { margin-top: 2rem; padding: .9rem 1.1rem; border-radius: var(--radius-md); background: rgba(0,170,255,.07); border: 1px solid rgba(0,170,255,.18); font-size: .82rem; color: var(--text-muted); line-height: 1.55; }
+.done-tip strong { color: var(--accent-1); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="done-wrap">
+
+  <!-- ── Hero emoji ──────────────────────────────────────── -->
+  <div class="done-emoji" role="img"
+       aria-label="{% if congratulate %}Festeggiamenti{% elif over_limit %}Tempo scaduto{% else %}Completato{% endif %}">
+    {% if congratulate %}&#x1F389;{% elif over_limit %}&#x23F1;&#xFE0F;{% else %}&#x2705;{% endif %}
+  </div>
+
+  <!-- ── Title ───────────────────────────────────────────── -->
+  <h1 class="done-title">
+    {% if congratulate %}
+      Ottimo lavoro!
+    {% elif over_limit %}
+      Limite raggiunto!
+    {% else %}
+      Sessione completata!
+    {% endif %}
+  </h1>
+
+  <!-- ── Subtitle ────────────────────────────────────────── -->
+  <p class="done-subtitle">
+    {% if congratulate %}
+      Hai imparato tutti i caratteri di oggi. Il tuo cervello sta assorbendo il coreano!
+    {% elif over_limit %}
+      Hai raggiunto il limite di studio di oggi. Riposati: la memoria consolida mentre dormi.
+    {% else %}
+      Buon lavoro! Continua così per mantenere la serie.
+    {% endif %}
+  </p>
+
+  <!-- ── Stats card ──────────────────────────────────────── -->
+  <div class="done-stats-card glass">
+
+    <div>
+      <div class="done-stats-label">Tempo studiato oggi</div>
+      <div style="margin-top:.4rem;">
+        <span class="done-time-value">{{ ts.minutes_studied }}</span>
+        <span class="done-time-unit">min</span>
+      </div>
+    </div>
+
+    <div class="done-progress-row">
+      <div class="done-progress-meta">
+        <span>Progresso giornaliero</span>
+        <span>{{ ts.pct_hard | round | int }}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill{% if ts.over_hard %} full{% elif ts.over_soft %} warn{% endif %}"
+             style="width: {{ [ts.pct_hard | round | int, 100] | min }}%">
+        </div>
+      </div>
+    </div>
+
+    <div class="done-badges">
+      {% if ts.over_hard %}
+      <span class="done-badge warn">&#x26A1; Limite massimo superato</span>
+      {% elif ts.over_soft %}
+      <span class="done-badge warn">&#x23F0; Obiettivo 15 min raggiunto</span>
+      {% else %}
+      <span class="done-badge info">&#x1F9E0; In corso &mdash; {{ 20 - ts.minutes_studied }} min al limite</span>
+      {% endif %}
+      {% if ts.pct_hard >= 50 %}
+      <span class="done-badge ok">&#x1F525; Buona sessione</span>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- ── Action buttons ──────────────────────────────────── -->
+  <div class="done-actions">
+    <a href="/dashboard" class="btn btn-primary" id="done-dash-btn">
+      &larr; Dashboard
+    </a>
+    <a href="/zen" class="btn btn-glass" id="done-zen-btn">
+      &#x1FAB7; Zen Mode
+    </a>
+    {% if congratulate %}
+    <a href="/review/start" class="btn btn-glass" id="done-review-btn"
+       style="border-color:rgba(94,231,223,.4); color:var(--accent-3);">
+      &#x1F4DA; Inizia Ripasso
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- ── Motivational tip ────────────────────────────────── -->
+  <div class="done-tip">
+    {% if congratulate %}
+      <strong>Suggerimento:</strong> Fai il ripasso delle carte già studiate per rinforzare la memoria a lungo termine con l&rsquo;algoritmo SRS.
+    {% elif over_limit %}
+      <strong>Sapevi che?</strong> Studiare troppo a lungo riduce l&rsquo;efficacia. Torna domani riposato per ottenere risultati migliori!
+    {% else %}
+      <strong>Continua così!</strong> La costanza quotidiana è il segreto per padroneggiare il coreano.
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

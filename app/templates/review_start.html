@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Inizia Ripasso — 한국어{% endblock %}
+
+{% block head %}
+<style>
+.start-card {
+  max-width: 520px;
+  margin: 3rem auto;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-glow);
+}
+.how-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.step-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+  font-size: .85rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-body strong { display:block; font-size:.92rem; margin-bottom:.15rem; }
+.step-body span   { font-size:.82rem; color: var(--text-muted); }
+.kbd {
+  display: inline-block;
+  background: rgba(255,255,255,.1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: .05rem .35rem;
+  font-size: .75rem;
+  font-family: monospace;
+  color: var(--text-muted);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-sm">
+  <div class="start-card">
+
+    <div style="text-align:center; margin-bottom:1.8rem;">
+      <div style="font-size:2.8rem; margin-bottom:.6rem;">📚</div>
+      <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:.3rem;">Pronto per il Ripasso?</h1>
+      <p style="color:var(--text-muted); font-size:.88rem;">
+        Oggi hai <strong style="color:var(--accent-2);">{{ due_count }}</strong> carte da ripassare
+        (max 25 al giorno).
+      </p>
+    </div>
+
+    <!-- Come funziona -->
+    <div style="margin-bottom:1.8rem;">
+      <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); margin-bottom:1rem;">
+        Come funziona
+      </div>
+
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Guarda il carattere</strong>
+          <span>Viene mostrato un Jamo o una sillaba coreana.</span>
+        </div>
+      </div>
+
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Scrivi la lettura</strong>
+          <span>Digita la Romaja (es: <em>ga</em>, <em>na</em>, <em>eo</em>) e premi
+            <span class="kbd">Invio</span> o il pulsante <strong>Verifica</strong>.</span>
+        </div>
+      </div>
+
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Vedi il risultato</strong>
+          <span>✅ Corretto → si avanza automaticamente.<br>
+                ❌ Sbagliato → viene mostrata la risposta giusta.</span>
+        </div>
+      </div>
+
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Algoritmo SRS</strong>
+          <span>Le carte che sbagli tornano prima, quelle facili spariscono per giorni.
+                Il limite è 20 min/giorno — poi vai in <strong>Zen Mode</strong>.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tasti rapidi -->
+    <div style="background:rgba(255,255,255,.04); border-radius:var(--radius-sm); padding:.8rem 1rem; margin-bottom:1.8rem; font-size:.8rem;">
+      <div style="color:var(--text-muted); margin-bottom:.4rem; font-weight:600;">⌨️ Scorciatoie tastiera</div>
+      <div style="display:flex; gap:1.2rem; flex-wrap:wrap; color:var(--text-dim);">
+        <span><span class="kbd">Invio</span> Verifica / Avanti</span>
+        <span><span class="kbd">1</span> Per niente</span>
+        <span><span class="kbd">2</span> Faticoso</span>
+        <span><span class="kbd">3</span> Quasi bene</span>
+        <span><span class="kbd">4</span> Perfetto</span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap;">
+      <a href="/review" class="btn btn-primary btn-lg" id="start-review-go-btn">
+        🚀 Inizia Ripasso
+      </a>
+      <a href="/dashboard" class="btn btn-glass" id="start-review-back-btn">← Torna</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
