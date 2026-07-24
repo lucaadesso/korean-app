@@ -14,7 +14,13 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     margin-bottom: .5rem;
     line-height: 1.1;
-  ">{{ word.j }}</div>
+  ">
+    {% for char in word.j %}{{ char }}{% if not loop.last %} <span style="color:var(--text-muted); font-size: 2rem;">+</span> {% endif %}{% endfor %}
+  </div>
+
+  <div style="font-size:1.4rem; color:var(--text-primary); margin-bottom: 0.5rem;">
+    Sillaba: <span style="font-weight:bold;">{{ word.j }}</span>
+  </div>
 
   <!-- Meaning -->
   <div style="font-size:.88rem; color:var(--text-muted); margin-bottom:1.4rem;">

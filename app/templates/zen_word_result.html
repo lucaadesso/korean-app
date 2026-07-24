@@ -9,7 +9,13 @@
     background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
     margin-bottom:.4rem; line-height:1.1;
-  ">{{ word.j }}</div>
+  ">
+    {% for char in word.j %}{{ char }}{% if not loop.last %} <span style="color:var(--text-muted); font-size: 2rem;">+</span> {% endif %}{% endfor %}
+  </div>
+
+  <div style="font-size:1.4rem; color:var(--text-primary); margin-bottom: 0.5rem;">
+    Sillaba: <span style="font-weight:bold;">{{ word.j }}</span>
+  </div>
 
   <!-- Romaja answer -->
   <div style="font-size:1.6rem; font-weight:700; color:var(--accent-3); margin-bottom:.3rem; letter-spacing:.06em;">
