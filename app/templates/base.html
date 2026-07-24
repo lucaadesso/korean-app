@@ -120,11 +120,14 @@
 
         // Soft cap: show modal instead of hard redirect (unless strict_mode)
         if (data.over_target && !_softCapShown) {
-          if (data.strict_mode) {
-            window.location.href = '/zen';
-          } else {
-            _softCapShown = true;
-            showSoftCapModal();
+          const isZen = window.location.pathname.startsWith('/zen');
+          if (!isZen) {
+            if (data.strict_mode) {
+              window.location.href = '/zen';
+            } else {
+              _softCapShown = true;
+              showSoftCapModal();
+            }
           }
         }
       }).catch(() => {});

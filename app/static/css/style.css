@@ -509,7 +509,7 @@ nav {
   .card-char { font-size: 4.5rem; }
   .quality-btns { grid-template-columns: repeat(2,1fr); }
   nav { padding: .6rem .5rem; gap: .2rem; flex-wrap: nowrap; }
-  .nav-brand span:not(.jp) { display: none; }
+  .nav-brand span:not(.jp):not(.kr) { display: none; }
   .nav-right { gap: .3rem; flex-wrap: nowrap; width: auto; justify-content: flex-end; }
   .btn { padding: .4rem .6rem; font-size: .9rem; }
   .nav-name { display: none; }
