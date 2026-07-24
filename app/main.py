@@ -478,8 +478,8 @@ async def placement_test(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "jamo_groups": srs.JAMO_GROUP_ORDER,
         "syllable_groups": srs.SYLLABLE_GROUP_ORDER,
-        "j_data": srs.JAMO_DATA,
-        "s_data": srs.SYLLABLE_DATA
+        "j_data": srs.JAMO_VOWELS_DATA + srs.JAMO_CONSONANTS_DATA,
+        "s_data": srs.SYLLABLE_BASIC_DATA + srs.SYLLABLE_ADVANCED_DATA
     })
 
 @app.post("/placement/submit", response_class=HTMLResponse)
