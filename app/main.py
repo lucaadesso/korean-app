@@ -42,6 +42,17 @@ app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY, max_age=7 * 24 * 36
 app.mount("/static", StaticFiles(directory="/home/ubuntu/korean-app/app/static"), name="static")
 templates = Jinja2Templates(directory="/home/ubuntu/korean-app/app/templates")
 
+original_template_response = templates.TemplateResponse
+
+def custom_template_response(name, context, *args, **kwargs):
+    if "t" not in context:
+        user = context.get("user")
+        lang = user.language if getattr(user, 'language', None) else 'it'
+        context["t"] = get_translator(lang)
+    return original_template_response(name, context, *args, **kwargs)
+
+templates.TemplateResponse = custom_template_response
+
 # ─── Routers ─────────────────────────────────────────────────────────────────
 
 app.include_router(auth_router)
