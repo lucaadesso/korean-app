@@ -82,7 +82,7 @@ class UserCard(Base):
     interval = Column(Integer, default=1)       # days until next review
     repetitions = Column(Integer, default=0)    # successful reviews in a row
     ease_factor = Column(Float, default=2.5)    # SM-2 ease factor
-    due_date = Column(Date, default=date.today)
+    due_date = Column(DateTime, default=datetime.now)
     last_reviewed = Column(Date, nullable=True)
 
     is_new = Column(Boolean, default=True)

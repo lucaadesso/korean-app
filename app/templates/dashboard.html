@@ -140,6 +140,19 @@
     </div>
   </div>
 
+  {% if user.active_days_this_month <= 2 and (not due_count) and new_today > 0 %}
+  <!-- Onboarding Tip -->
+  <div class="alert alert-info" style="margin-bottom:1.5rem; border-color:var(--accent-1); display:flex; gap:1rem; align-items:start;">
+    <div style="font-size:1.5rem;">🧠</div>
+    <div>
+      <div style="font-weight:700; margin-bottom:.3rem; color:var(--text-primary);">Perché imparo così poco all'inizio?</div>
+      <div style="font-size:.85rem; color:var(--text-muted);">
+        Il nostro algoritmo SRS limita di proposito l'introduzione di nuovi concetti a <strong>pochi caratteri al giorno</strong>. Questo evita il sovraccarico cognitivo e favorisce una memorizzazione a lungo termine. Una volta introdotti, i caratteri riappariranno per un ripasso dopo 10 minuti. Non preoccuparti, il ritmo accelererà naturalmente nei prossimi giorni!
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- ── Study-time bar ─────────────────────────────────── -->
   <div style="background:var(--bg-glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem 1.4rem; margin-bottom:1.5rem;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem; font-size:.85rem;">
