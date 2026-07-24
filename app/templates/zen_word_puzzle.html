@@ -28,7 +28,7 @@
     hx-swap="outerHTML"
     style="max-width:360px; margin:0 auto;"
   >
-    <div style="display:flex; gap:.6rem;">
+    <div style="display:flex; flex-direction:column; gap:.8rem;">
       <input
         type="text"
         name="answer"
@@ -55,7 +55,7 @@
         padding:.75rem 1.2rem; border-radius:var(--radius-md);
         background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
         color:#fff; border:none; font-weight:700; font-size:.9rem;
-        cursor:pointer; white-space:nowrap;
+        cursor:pointer; white-space:nowrap; width:100%;
         transition:transform .15s, box-shadow .15s;
         font-family:'Inter',sans-serif;
       " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
