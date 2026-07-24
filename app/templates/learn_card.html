@@ -480,11 +480,23 @@ function normalise(s) {
 function isMatch(input) {
   const n = normalise(input);
   if (!n) return false;
-  const targets = [
-    normalise(CORRECT_ANSWER),
-    normalise(CORRECT_ROMANJI),
-  ].filter(Boolean);
-  return targets.some(t => t === n);
+  const targets = [];
+  
+  if (CORRECT_ANSWER) {
+    targets.push(normalise(CORRECT_ANSWER));
+    if (CORRECT_ANSWER.includes('/')) {
+      CORRECT_ANSWER.split('/').forEach(t => targets.push(normalise(t)));
+    }
+  }
+  
+  if (CORRECT_ROMANJI) {
+    targets.push(normalise(CORRECT_ROMANJI));
+    if (CORRECT_ROMANJI.includes('/')) {
+      CORRECT_ROMANJI.split('/').forEach(t => targets.push(normalise(t)));
+    }
+  }
+  
+  return targets.includes(n);
 }
 
 // ── Switch from study to quiz ─────────────────────────────────────

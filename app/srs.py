@@ -179,6 +179,24 @@ def get_learn_cards_for_session(db: Session, user: User, limit: Optional[int] = 
     phase = current["phase"]
     group = current["group"]
 
+    # First, get all fast_lane=True cards for this group (unlimited)
+    fast_lane_cards = (
+        db.query(UserCard)
+        .join(Card, UserCard.card_id == Card.id)
+        .filter(
+            UserCard.user_id    == user.id,
+            UserCard.srs_stage  == 0,
+            UserCard.fast_lane  == True,
+            Card.phase          == phase,
+            Card.group_name     == group,
+        )
+        .order_by(Card.id)
+        .all()
+    )
+
+    if fast_lane_cards:
+        return fast_lane_cards
+
     already_today = count_new_learned_today(db, user)
     remaining_slots = max(0, cap - already_today)
     if remaining_slots == 0:
