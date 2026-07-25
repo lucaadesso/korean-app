@@ -137,11 +137,26 @@ def sm2_update(uc: UserCard, quality: int) -> UserCard:
     return uc
 
 
-def mark_card_learned(uc: UserCard) -> UserCard:
-    """Mark a card as finished Learn Mode and ready for SRS."""
-    uc.srs_stage = 1
-    uc.due_date = datetime.now() # Due immediately for the mini-review
-    uc.fast_lane = False
+def mark_card_learned(db: Session, uc: UserCard, fast_lane_failed: bool = False) -> UserCard:
+    """Mark a UserCard as introduced via Learn."""
+    from datetime import date
+    today = date.today()
+    uc.is_new         = False
+    uc.last_reviewed  = today
+    uc.introduced_date = today
+
+    if getattr(uc, "fast_lane", False) and not fast_lane_failed:
+        # Fast-lane success! Graduate immediately.
+        uc.srs_stage = 2
+        uc.interval = 1
+        uc.repetitions = 1
+        uc.due_date = datetime.now() + timedelta(days=1)
+        uc.fast_lane = False
+    else:
+        uc.srs_stage = 1
+        uc.due_date = datetime.now() # Due immediately for the mini-review
+        uc.fast_lane = False
+        
     return uc
 
 
