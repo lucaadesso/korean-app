@@ -122,16 +122,16 @@ ul.perks li {
         </ul>
         
         <div class="progress-container">
-            <div class="progress-fill" style="width: {{ progress.jamo.phase.pct_learned }}%;"></div>
+            <div class="progress-fill" style="width: {{ progress.jamo.pct_learned }}%;"></div>
         </div>
         <div class="level-stats">
             <span>Avanzamento Hangul</span>
-            <span>{{ progress.jamo.phase.learned }} / {{ progress.jamo.phase.total }} ({{ progress.jamo.phase.pct_learned }}%)</span>
+            <span>{{ progress.jamo.learned }} / {{ progress.jamo.total }} ({{ progress.jamo.pct_learned }}%)</span>
         </div>
     </div>
 
     <!-- Livello 1 -->
-    <div class="level-card {% if progress.jamo.phase.pct_learned == 100 %}active{% else %}locked{% endif %}">
+    <div class="level-card {% if progress.jamo.pct_learned == 100 %}active{% else %}locked{% endif %}">
         <div class="level-header">
             <div class="level-title">🗣️ Livello 1: Sopravvivenza (TOPIK 1)</div>
             <div class="level-badge">~800 Vocaboli</div>
