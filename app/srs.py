@@ -486,7 +486,7 @@ def ensure_user_cards(db: Session, user: User) -> None:
 import json
 import os
 
-ZEN_VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "zen_vocab.json")
+ZEN_VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "zen_lv0.json")
 try:
     with open(ZEN_VOCAB_PATH, "r", encoding="utf-8") as f:
         ZEN_VOCAB = json.load(f)
