@@ -116,3 +116,12 @@ class DailyStudy(Base):
     seconds_studied = Column(Integer, default=0)
 
     user = relationship("User", back_populates="daily_studies")
+
+class ZenWordProgress(Base):
+    __tablename__ = "zen_word_progress"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    word_id = Column(Integer, nullable=False)
+    step1_progress = Column(String, default="[]")  # JSON string array
+    step2_correct_count = Column(Integer, default=0)
+    last_reviewed = Column(DateTime, default=datetime.utcnow)

@@ -1,101 +1,161 @@
-<!-- Zen Word Result — HTMX partial shown after answer check -->
+{# Partial: zen_word_result.html — shown after correct answer or hint #}
+{# is_correct: True=correct, False=wrong, None=hint #}
+
 <div id="zen-word-puzzle"
-     style="background:var(--bg-glass); border:1px solid var(--border); border-radius:24px; padding:1.8rem; text-align:center; animation: fadeSlideIn .35s ease;">
+     style="
+       border-radius: 24px;
+       padding: 2rem;
+       text-align: center;
+       animation: fadeSlideIn .3s ease;
+       {% if is_correct == true %}
+       background: linear-gradient(135deg, rgba(94,231,160,.1), rgba(94,231,223,.07));
+       border: 1px solid rgba(94,231,160,.3);
+       {% elif is_correct == false %}
+       background: linear-gradient(135deg, rgba(255,107,107,.08), rgba(255,190,85,.05));
+       border: 1px solid rgba(255,107,107,.25);
+       {% else %}
+       background: linear-gradient(135deg, rgba(255,190,85,.08), rgba(180,111,255,.05));
+       border: 1px solid rgba(255,190,85,.25);
+       {% endif %}
+     ">
 
-  <!-- Korean word (large) -->
+  <!-- Status badge -->
+  <div style="font-size: 2.5rem; margin-bottom: .6rem;">
+    {% if is_correct == true %}✅
+    {% elif is_correct == false %}❌
+    {% else %}💡
+    {% endif %}
+  </div>
+
+  <!-- Japanese word (large) -->
   <div style="
-    font-family:'Noto Sans KR',sans-serif;
-    font-size:3.5rem; font-weight:700; letter-spacing:.08em;
-    background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    margin-bottom:.4rem; line-height:1.1;
-  ">
-    {% for char in word.j %}{{ char }}{% if not loop.last %} <span style="color:var(--text-muted); font-size: 2rem;">+</span> {% endif %}{% endfor %}
-  </div>
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    margin-bottom: .4rem;
+    {% if is_correct == true %}
+    background: linear-gradient(135deg, #5ee7a0, #5ee7df);
+    {% elif is_correct == false and force_other %}
+    background: linear-gradient(135deg, #ffbe55, #ff6b6b);
+    {% elif is_correct == false %}
+    background: linear-gradient(135deg, #ff6b6b, #ffbe55);
+    {% else %}
+    background: linear-gradient(135deg, #ffbe55, #b46fff);
+    {% endif %}
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  ">{{ word.j }}</div>
 
-  <div style="font-size:1.4rem; color:var(--text-primary); margin-bottom: 0.5rem;">
-    Sillaba: <span style="font-weight:bold;">{{ word.j }}</span>
-  </div>
-
-  <!-- Romaja answer -->
-  <div style="font-size:1.6rem; font-weight:700; color:var(--accent-3); margin-bottom:.3rem; letter-spacing:.06em;">
+  <!-- Romaji -->
+  <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent-3); margin-bottom: .2rem;">
     {{ word.r }}
   </div>
 
   <!-- Meaning -->
-  <div style="font-size:.88rem; color:var(--text-muted); margin-bottom:1.2rem;">
-    🇮🇹 {{ word.m }}
-  </div>
+  <div style="
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: .8rem;
+  ">{{ word.m }}</div>
 
-  <!-- Result badge -->
-  {% if is_correct is none %}
-    <!-- Hint mode: no judgement -->
-    <div style="
-      display:inline-flex; align-items:center; gap:.5rem;
-      background:rgba(255,190,85,.12); border:1px solid rgba(255,190,85,.3);
-      border-radius:100px; padding:.4rem 1.1rem;
-      color:var(--accent-warn); font-weight:600; font-size:.88rem;
-      margin-bottom:1.2rem;
-    ">💡 Risposta mostrata — nessuna penalità</div>
-  {% elif is_correct %}
-    <div style="
-      display:inline-flex; align-items:center; gap:.5rem;
-      background:rgba(94,231,160,.12); border:1px solid rgba(94,231,160,.3);
-      border-radius:100px; padding:.4rem 1.1rem;
-      color:var(--accent-ok); font-weight:600; font-size:.88rem;
-      margin-bottom:1.2rem;
-    ">✅ Corretto! Ottimo!</div>
-  {% else %}
-    <div style="
-      display:inline-flex; align-items:center; gap:.5rem;
-      background:rgba(255,107,107,.12); border:1px solid rgba(255,107,107,.3);
-      border-radius:100px; padding:.4rem 1.1rem;
-      color:var(--accent-bad); font-weight:600; font-size:.88rem;
-      margin-bottom:1.2rem;
-    ">❌ Hai scritto: <em>{{ user_answer }}</em></div>
+  {% if is_correct == false and force_other %}
+    <div style="font-size:1rem; font-weight:600; color:var(--accent-warn); margin-bottom:1rem;">
+      Giusto, ma hai usato troppo questa variante! Prova a digitare: <strong>{{ word.r }}</strong> oppure <strong>{{ word.m }}</strong>.
+    </div>
+  {% elif is_correct == false and user_answer %}
+  <div style="font-size:.82rem; color:var(--text-muted); margin-bottom:.8rem;">
+    Hai risposto: «<em>{{ user_answer }}</em>» — La risposta corretta è «<strong>{{ word.r }}</strong>»
+  </div>
   {% endif %}
 
-  <!-- Action buttons -->
-  <div style="display:flex; gap:.7rem; justify-content:center; flex-wrap:wrap;">
+  <!-- Audio button (Web Speech API — no files needed) -->
+  <button
+    onclick="speakKorean('{{ word.j }}')"
+    id="zen-audio-btn"
+    style="
+      background: rgba(94,231,223,.15);
+      border: 1px solid rgba(94,231,223,.3);
+      border-radius: 100px;
+      color: var(--accent-3);
+      padding: .45rem 1.1rem;
+      font-size: .85rem;
+      cursor: pointer;
+      margin-bottom: 1.2rem;
+      transition: background .2s;
+    "
+    onmouseover="this.style.background='rgba(94,231,223,.25)'"
+    onmouseout="this.style.background='rgba(94,231,223,.15)'"
+  >
+    🔊 Ascolta la pronuncia
+  </button>
 
-    <!-- 🔊 TTS button (uses speakKorean from zen_mode.html) -->
-    <button
-      type="button"
-      onclick="if(typeof speakKorean==='function') speakKorean('{{ word.j }}')"
-      style="
-        padding:.55rem 1rem; border-radius:var(--radius-md);
-        background:rgba(0,170,255,.12); border:1px solid rgba(0,170,255,.3);
-        color:var(--accent-1); font-size:.88rem; cursor:pointer;
-        transition:background .2s; font-family:'Inter',sans-serif;
-      "
-      onmouseover="this.style.background='rgba(0,170,255,.2)'"
-      onmouseout="this.style.background='rgba(0,170,255,.12)'"
-      id="zen-speak-btn"
-    >🔊 Ascolta</button>
-
-    {% if has_next %}
-    <!-- Next word button -->
+  <!-- Next word button -->
+  {% if has_next %}
+  <div>
     <button
       hx-get="/api/zen/word?exclude={{ exclude_id }}"
       hx-target="#zen-word-puzzle"
       hx-swap="outerHTML"
-      style="
-        padding:.55rem 1.2rem; border-radius:var(--radius-md);
-        background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
-        border:none; color:#fff; font-weight:700; font-size:.9rem;
-        cursor:pointer; transition:transform .15s, box-shadow .15s;
-        font-family:'Inter',sans-serif;
-      "
-      onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,170,255,.4)'"
-      onmouseout="this.style.transform=''; this.style.boxShadow=''"
       id="zen-next-word-btn"
-    >Prossima parola →</button>
-    {% else %}
-    <div style="font-size:.82rem; color:var(--text-muted); padding:.55rem 1rem;">
-      🎉 Hai visto tutte le parole disponibili!
-    </div>
-    {% endif %}
-
+      style="
+        padding: .75rem 1.8rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform .15s, box-shadow .15s;
+      "
+      onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(180,111,255,.4)'"
+      onmouseout="this.style.transform='none'; this.style.boxShadow='none'"
+    >
+      → Prossima parola
+    </button>
   </div>
+  {% else %}
+  <div style="margin-top:.5rem; color:var(--text-muted); font-size:.85rem;">
+    🎉 Hai visto tutte le parole disponibili! Impara più caratteri per sbloccarne altre.
+  </div>
+  <a href="/learn" class="btn btn-glass" style="margin-top:.8rem; display:inline-block;" id="zen-result-learn">🌱 Impara più caratteri</a>
+  {% endif %}
 
 </div>
+
+<script>
+// Auto-speak on reveal
+function speakKorean(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang  = 'ko-KR';
+  utt.rate  = 0.85;
+  utt.pitch = 1.0;
+  setTimeout(() => window.speechSynthesis.speak(utt), 250);
+}
+
+// Auto-play on load
+(function() {
+  {% if is_correct == true or is_correct == none %}
+  setTimeout(() => speakKorean('{{ word.j }}'), 300);
+  {% endif %}
+
+  // Next word with Enter key
+  document.addEventListener('keydown', function _nextKey(e) {
+    if (e.key === 'Enter' || e.key === 'ArrowRight') {
+      const btn = document.getElementById('zen-next-word-btn');
+      if (btn) { e.preventDefault(); btn.click(); }
+      document.removeEventListener('keydown', _nextKey);
+    }
+  }, { once: false });
+})();
+</script>
+
+<style>
+@keyframes fadeSlideIn {
+  from { opacity:0; transform: translateY(10px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+</style>

@@ -137,6 +137,14 @@ def sm2_update(uc: UserCard, quality: int) -> UserCard:
     return uc
 
 
+def mark_card_learned(uc: UserCard) -> UserCard:
+    """Mark a card as finished Learn Mode and ready for SRS."""
+    uc.srs_stage = 1
+    uc.due_date = datetime.now() # Due immediately for the mini-review
+    uc.fast_lane = False
+    return uc
+
+
 # ─── Learn Mode helpers ───────────────────────────────────────────────────────
 
 def get_current_learn_group(db: Session, user: User) -> Optional[dict]:
@@ -220,48 +228,19 @@ def get_learn_cards_for_session(db: Session, user: User, limit: Optional[int] = 
 
 def count_new_learned_today(db: Session, user: User) -> int:
     """Count cards introduced via Learn TODAY (uses introduced_date, not last_reviewed)."""
-    from datetime import date as _date
-    today = _date.today()
     return (
         db.query(UserCard)
         .filter(
-            UserCard.user_id       == user.id,
-            UserCard.introduced_date == today,    # set only by mark_card_learned()
+            UserCard.user_id == user.id,
+            UserCard.introduced_date == date.today(),
         )
         .count()
     )
 
 
-def mark_card_learned(db: Session, uc: UserCard, fast_lane_failed: bool = False) -> UserCard:
-    """Mark a UserCard as introduced via Learn."""
-    today = date.today()
-    uc.is_new         = False
-    uc.last_reviewed  = today
-    uc.introduced_date = today          # ← track when this card was first introduced
-
-    if getattr(uc, "fast_lane", False) and not fast_lane_failed:
-        # Fast-lane success! Graduate immediately.
-        uc.srs_stage = 2
-        uc.interval = 1
-        uc.repetitions = 1
-        uc.due_date = datetime.now() + timedelta(days=1)
-        uc.fast_lane = False
-    else:
-        uc.srs_stage = 1
-        uc.due_date = datetime.now() + timedelta(minutes=10)
-        uc.fast_lane = False
-
-    db.commit()
-    db.refresh(uc)
-    return uc
-
-
-# ─── Daily card queue (Review) ────────────────────────────────────────────────
-
 def get_due_cards(db: Session, user: User, limit: int = DAILY_CARD_CAP) -> list[UserCard]:
     """Returns up to `limit` UserCards due today (srs_stage >= 1, due today or overdue)."""
-    today = date.today()
-    return (
+    cards = (
         db.query(UserCard)
         .filter(
             UserCard.user_id == user.id,
@@ -272,6 +251,9 @@ def get_due_cards(db: Session, user: User, limit: int = DAILY_CARD_CAP) -> list[
         .limit(limit)
         .all()
     )
+    import random
+    random.shuffle(cards)
+    return cards
 
 
 # ─── Progress helpers ─────────────────────────────────────────────────────────
@@ -486,50 +468,18 @@ def ensure_user_cards(db: Session, user: User) -> None:
 # Vocab list: Korean words composed only of characters the user has learned.
 # (id, korean, romaja, meaning_it, chars)
 # chars = set of Hangul characters/jamo composing the word.
-ZEN_VOCAB: list[dict] = [
-    # ── Jamo combinations (Day 1 Zen Mode) ──────────────────────────────
-    {"id": 101, "j": "ㄱ + ㅏ", "r": "ga",  "m": "Sillaba 'ga' (가)", "k": {"ㄱ", "ㅏ"}},
-    {"id": 102, "j": "ㄴ + ㅗ", "r": "no",  "m": "Sillaba 'no' (노)", "k": {"ㄴ", "ㅗ"}},
-    {"id": 103, "j": "ㅁ + ㅜ", "r": "mu",  "m": "Sillaba 'mu' (무)", "k": {"ㅁ", "ㅜ"}},
-    {"id": 104, "j": "ㅂ + ㅣ", "r": "bi",  "m": "Sillaba 'bi' (비)", "k": {"ㅂ", "ㅣ"}},
-    {"id": 105, "j": "ㅅ + ㅓ", "r": "seo", "m": "Sillaba 'seo' (서)", "k": {"ㅅ", "ㅓ"}},
-    {"id": 106, "j": "ㅇ + ㅠ", "r": "yu",  "m": "Sillaba 'yu' (유)", "k": {"ㅇ", "ㅠ"}},
-    {"id": 107, "j": "ㅈ + ㅡ", "r": "jeu", "m": "Sillaba 'jeu' (즈)", "k": {"ㅈ", "ㅡ"}},
-    {"id": 108, "j": "ㅎ + ㅗ", "r": "ho",  "m": "Sillaba 'ho' (호)", "k": {"ㅎ", "ㅗ"}},
+import json
+import os
 
-    # ── From basic syllables ──────────────────────────────────────────────
-    {"id":  1, "j": "나",    "r": "na",    "m": "Io / Io stesso",         "k": {"나"}},
-    {"id":  2, "j": "가다",  "r": "gada",  "m": "Andare",                 "k": {"가", "다"}},
-    {"id":  3, "j": "나라",  "r": "nara",  "m": "Paese / Nazione",        "k": {"나", "라"}},
-    {"id":  4, "j": "바다",  "r": "bada",  "m": "Mare",                   "k": {"바", "다"}},
-    {"id":  5, "j": "마다",  "r": "mada",  "m": "Ogni / Tutto",           "k": {"마", "다"}},
-    {"id":  6, "j": "차",    "r": "cha",   "m": "Tè / Auto",              "k": {"차"}},
-    {"id":  7, "j": "나타나다","r":"natanada","m": "Apparire",             "k": {"나", "타"}},
-    {"id":  8, "j": "하다",  "r": "hada",  "m": "Fare",                   "k": {"하", "다"}},
-    {"id":  9, "j": "사다",  "r": "sada",  "m": "Comprare",               "k": {"사", "다"}},
-    {"id": 10, "j": "자다",  "r": "jada",  "m": "Dormire",                "k": {"자", "다"}},
-    {"id": 11, "j": "타다",  "r": "tada",  "m": "Salire / Bruciare",      "k": {"타", "다"}},
-    {"id": 12, "j": "파다",  "r": "pada",  "m": "Scavare",                "k": {"파", "다"}},
-    {"id": 13, "j": "가나",  "r": "gana",  "m": "Alfabeto / Ghana",       "k": {"가", "나"}},
-    {"id": 14, "j": "마차",  "r": "macha", "m": "Carrozza",               "k": {"마", "차"}},
-    # ── From advanced syllables ───────────────────────────────────────────
-    {"id": 15, "j": "고기",  "r": "gogi",  "m": "Carne",                  "k": {"고", "기"}},
-    {"id": 16, "j": "소고기","r": "sogogi","m": "Carne di manzo",         "k": {"소", "고", "기"}},
-    {"id": 17, "j": "미소",  "r": "miso",  "m": "Sorriso",                "k": {"미", "소"}},
-    {"id": 18, "j": "노래",  "r": "norae", "m": "Canzone",                "k": {"노"}},
-    {"id": 19, "j": "도시",  "r": "dosi",  "m": "Città",                  "k": {"도", "시"}},
-    {"id": 20, "j": "모기",  "r": "mogi",  "m": "Zanzara",                "k": {"모", "기"}},
-    {"id": 21, "j": "고도",  "r": "godo",  "m": "Altitudine",             "k": {"고", "도"}},
-    {"id": 22, "j": "보고",  "r": "bogo",  "m": "Rapporto / Guardare",    "k": {"보", "고"}},
-    {"id": 23, "j": "가수",  "r": "gasu",  "m": "Cantante",               "k": {"가"}},
-    {"id": 24, "j": "미미",  "r": "mimi",  "m": "Insignificante",         "k": {"미"}},
-    {"id": 25, "j": "누나",  "r": "nuna",  "m": "Sorella maggiore (di un maschio)", "k": {"누", "나"}},
-    {"id": 26, "j": "두부",  "r": "dubu",  "m": "Tofu",                   "k": {"두", "부"}},
-    {"id": 27, "j": "소시",  "r": "sosi",  "m": "Salsiccia (abbrev.)",    "k": {"소", "시"}},
-    {"id": 28, "j": "나무",  "r": "namu",  "m": "Albero",                 "k": {"나", "무"}},
-    {"id": 29, "j": "무기",  "r": "mugi",  "m": "Arma",                   "k": {"무", "기"}},
-    {"id": 30, "j": "보도",  "r": "bodo",  "m": "Notizie / Marciapiede",  "k": {"보", "도"}},
-]
+ZEN_VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "zen_vocab.json")
+try:
+    with open(ZEN_VOCAB_PATH, "r", encoding="utf-8") as f:
+        ZEN_VOCAB = json.load(f)
+    for w in ZEN_VOCAB:
+        w["k"] = set(w["k"])
+except FileNotFoundError:
+    ZEN_VOCAB = []
+
 
 
 def get_user_learned_syllables(db: Session, user: User) -> frozenset[str]:
@@ -548,23 +498,92 @@ def get_user_learned_syllables(db: Session, user: User) -> frozenset[str]:
 
 
 def get_zen_words(db: Session, user: User, exclude_id: Optional[int] = None) -> list[dict]:
-    """
-    Return vocab words whose characters are ALL in the user's learned set.
-    Optionally exclude a word id (to avoid showing the same word twice).
-    Words are randomised.
-    """
     import random
+    from app.models import ZenWordProgress
     learned = get_user_learned_syllables(db, user)
     if not learned:
         return []
 
-    available = [
-        w for w in ZEN_VOCAB
-        if w["k"].issubset(learned) and w["id"] != exclude_id
-    ]
+    progress_records = db.query(ZenWordProgress).filter(ZenWordProgress.user_id == user.id).all()
+    progress_map = {p.word_id: p for p in progress_records}
+
+    available = []
+    for w in ZEN_VOCAB:
+        if not w["k"].issubset(learned) or w["id"] == exclude_id:
+            continue
+            
+        p = progress_map.get(w["id"])
+        if p:
+            import json
+            try:
+                arr = json.loads(p.step1_progress)
+                step1 = sum(arr) if arr else 0
+            except:
+                step1 = 0
+            step2 = p.step2_correct_count
+        else:
+            step1 = 0
+            step2 = 0
+        
+        if step2 >= 10:
+            if random.random() < 0.9:
+                continue
+            step = 2
+        elif step1 >= 5:
+            step = 2
+        else:
+            step = 1
+            
+        word_data = dict(w)
+        word_data["step"] = step
+        word_data["_step1_count"] = step1
+        
+        if step == 2:
+            correct_chars = list(word_data["j"])
+            distractors = list(learned)
+            random.shuffle(distractors)
+            
+            symbols = list(correct_chars)
+            while len(symbols) < 10:
+                if distractors:
+                    symbols.append(distractors.pop())
+                else:
+                    # In Korean, we can pick random basic syllables
+                    symbols.append("가") # Fallback
+            
+            random.shuffle(symbols)
+            word_data["symbols"] = symbols
+            
+        available.append(word_data)
+
     random.shuffle(available)
+    available.sort(key=lambda x: (x["step"], x["_step1_count"]))
     return available
 
+def record_zen_word_success(db: Session, user: User, word_id: int, step: int, match_idx: int = -1, total_variants: int = 1):
+    from app.models import ZenWordProgress
+    from datetime import datetime
+    import json
+    p = db.query(ZenWordProgress).filter(ZenWordProgress.user_id == user.id, ZenWordProgress.word_id == word_id).first()
+    if not p:
+        p = ZenWordProgress(user_id=user.id, word_id=word_id, step1_progress="[]", step2_correct_count=0)
+        db.add(p)
+    
+    if step == 1:
+        try:
+            arr = json.loads(p.step1_progress)
+        except:
+            arr = []
+        if len(arr) != total_variants:
+            arr = [0] * total_variants
+        if 0 <= match_idx < total_variants:
+            arr[match_idx] += 1
+        p.step1_progress = json.dumps(arr)
+    elif step == 2:
+        p.step2_correct_count += 1
+    
+    p.last_reviewed = datetime.now()
+    db.commit()
 
 def get_zen_word_by_id(word_id: int) -> Optional[dict]:
     """Look up a single vocab word from the in-memory list."""

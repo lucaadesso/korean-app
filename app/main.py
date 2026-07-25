@@ -229,11 +229,17 @@ async def submit_learn(uc_id: int, request: Request, db: Session = Depends(get_d
 
     # Over target but not strict mode → continue, soft warning shown by next card page
     if ts["over_target"] and user.strict_mode:
-        t = get_translator(user.language if user else 'it')
-        return templates.TemplateResponse("learn_done.html", {"t": t, 
+        return templates.TemplateResponse("learn_done.html", {
             "request":      request, "user": user, "ts": ts,
             "over_limit":   True, "congratulate": False,
         })
+
+    # Mini-review after every 5 cards learned
+    already_today = srs.count_new_learned_today(db, user)
+    if already_today > 0 and already_today % 5 == 0:
+        due_cards = srs.get_due_cards(db, user)
+        if due_cards:
+            return RedirectResponse(url="/review/start", status_code=303)
 
     return RedirectResponse(url="/learn/card", status_code=303)
 
@@ -381,34 +387,75 @@ async def zen_word(
 
 @app.post("/api/zen/word/check/{word_id}", response_class=HTMLResponse)
 async def zen_word_check(word_id: int, request: Request, db: Session = Depends(get_db)):
-    """Check the user's romaja answer. Returns reveal partial if correct, feedback if wrong."""
+    """Check the user's romaji answer. Returns reveal partial if correct, feedback if wrong."""
     user = require_user(request, db)
     form = await request.form()
     raw_answer = (form.get("answer") or "").strip().lower()
     answer = raw_answer.replace(" ", "")
+    step = int(form.get("step") or 1)
 
     word = srs.get_zen_word_by_id(word_id)
     if not word:
         return HTMLResponse("<div>Parola non trovata.</div>", status_code=404)
 
-    import difflib
-    correct = word["r"].lower().replace(" ", "")
-    
-    def is_match(a, b):
-        if a == b: return True
-        if len(a) > 3 and difflib.SequenceMatcher(None, a, b).ratio() >= 0.8: return True
-        return False
-        
     is_correct = False
-    if is_match(answer, correct):
-        is_correct = True
-    else:
-        # Check meanings
+    match_idx = -1
+    total_variants = 1
+    force_other = False
+    
+    if step == 1:
+        import difflib
+        import json
+        correct_r = word["r"].lower().replace(" ", "")
         meanings = [m.strip().lower().replace(" ", "") for m in word["m"].split("/")]
-        for m in meanings:
-            if is_match(answer, m) or is_match(raw_answer, m):
+        total_variants = 1 + len(meanings)
+        
+        # Load progress to enforce balance
+        from app.models import ZenWordProgress
+        p = db.query(ZenWordProgress).filter(ZenWordProgress.user_id == user.id, ZenWordProgress.word_id == word_id).first()
+        try:
+            arr = json.loads(p.step1_progress) if p else []
+        except:
+            arr = []
+        if len(arr) != total_variants:
+            arr = [0] * total_variants
+            
+        def check_balance(idx):
+            if arr[idx] >= min(arr) + 3:
+                return False
+            return True
+            
+        # Levenshtein / ratio check function
+        def is_match(a, b):
+            if a == b: return True
+            if len(a) > 3 and difflib.SequenceMatcher(None, a, b).ratio() >= 0.8: return True
+            return False
+            
+        # Check Romaji (index 0)
+        if is_match(answer, correct_r):
+            if check_balance(0):
                 is_correct = True
-                break
+                match_idx = 0
+            else:
+                force_other = True
+        
+        # Check meanings (indices 1..N)
+        if not is_correct:
+            for i, m in enumerate(meanings):
+                if is_match(answer, m) or is_match(raw_answer, m):
+                    if check_balance(i + 1):
+                        is_correct = True
+                        match_idx = i + 1
+                        force_other = False
+                        break
+                    else:
+                        force_other = True
+    else:
+        correct = word["j"].replace(" ", "")
+        is_correct = (answer == correct)
+
+    if is_correct:
+        srs.record_zen_word_success(db, user, word_id, step, match_idx, total_variants)
 
     # Count words still available (exclude current)
     words_left = srs.get_zen_words(db, user, exclude_id=word_id)
@@ -418,6 +465,7 @@ async def zen_word_check(word_id: int, request: Request, db: Session = Depends(g
         "request":    request,
         "word":       word,
         "is_correct": is_correct,
+        "force_other": force_other,
         "user_answer": form.get("answer", ""),
         "has_next":   len(words_left) > 0,
         "exclude_id": word_id,
@@ -439,6 +487,7 @@ async def zen_word_hint(word_id: int, request: Request, db: Session = Depends(ge
         "request":    request,
         "word":       word,
         "is_correct": None,   # None = shown via hint (no judgement)
+        "force_other": False,
         "user_answer": "",
         "has_next":   len(words_left) > 0,
         "exclude_id": word_id,

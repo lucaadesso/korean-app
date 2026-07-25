@@ -442,7 +442,7 @@ function speakText(text) {
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang = 'ko-KR';
   utt.rate = 0.85;
-  setTimeout(() => window.speechSynthesis.speak(utt), 100);
+  setTimeout(() => window.speechSynthesis.speak(utt), 250);
 }
 
 // ── Pause overlay ─────────────────────────────────────────────────
