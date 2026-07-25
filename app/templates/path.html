@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Il tuo percorso (TOPIK) — 한국어{% endblock %}
+
+{% block head %}
+<style>
+.path-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+.level-card {
+    background: var(--bg-glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.level-card.active {
+    border-color: rgba(0, 170, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 170, 255, 0.15);
+}
+.level-card.locked {
+    opacity: 0.6;
+    filter: grayscale(80%);
+}
+.level-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 0.8rem;
+}
+.level-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.level-badge {
+    background: rgba(255,255,255,0.08);
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.active .level-badge {
+    background: var(--accent-1);
+    color: #fff;
+}
+.progress-container {
+    margin-top: 1rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 100px;
+    height: 8px;
+    overflow: hidden;
+    position: relative;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-3), var(--accent-1));
+    border-radius: 100px;
+    transition: width 1s ease-out;
+}
+.level-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+.level-desc {
+    color: var(--text-muted);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+ul.perks {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+ul.perks li {
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="path-container">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem;">Il Tuo Percorso</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto;">
+            L'apprendimento del coreano è un viaggio strutturato sui livelli ufficiali <strong>TOPIK</strong> (Test of Proficiency in Korean). Scopri la tua roadmap verso la padronanza.
+        </p>
+    </div>
+
+    <!-- Livello 0 -->
+    <div class="level-card active">
+        <div class="level-header">
+            <div class="level-title">🌱 Livello 0: Fondamenta</div>
+            <div class="level-badge">IN CORSO</div>
+        </div>
+        <div class="level-desc">
+            Questa è la fase in cui ti trovi adesso. L'obiettivo è abituare il cervello alla lingua prima ancora di studiare grammatica complessa.
+        </div>
+        <ul class="perks">
+            <li>✅ <strong>Alfabeto (Hangul):</strong> Imparerai Jamo (vocali/consonanti) e blocchi sillabici.</li>
+            <li>✅ <strong>Esposizione Passiva:</strong> Nella Zen Mode, sarai esposto a parole base in modo semi-casuale per allenare la lettura.</li>
+            <li>✅ <strong>Nessuna grammatica:</strong> Solo assorbimento di suoni e forme.</li>
+        </ul>
+        
+        <div class="progress-container">
+            <div class="progress-fill" style="width: {{ progress.jamo.phase.pct_learned }}%;"></div>
+        </div>
+        <div class="level-stats">
+            <span>Avanzamento Hangul</span>
+            <span>{{ progress.jamo.phase.pct_learned }}%</span>
+        </div>
+    </div>
+
+    <!-- Livello 1 -->
+    <div class="level-card {% if progress.jamo.phase.pct_learned == 100 %}active{% else %}locked{% endif %}">
+        <div class="level-header">
+            <div class="level-title">🗣️ Livello 1: Sopravvivenza (TOPIK 1)</div>
+            <div class="level-badge">~800 Vocaboli</div>
+        </div>
+        <div class="level-desc">
+            Sbloccato una volta padroneggiato l'Hangul. Qui inizierai a costruire il tuo vero vocabolario di base.
+        </div>
+        <ul class="perks">
+            <li>🔒 <strong>Sostantivi e Verbi Base:</strong> Le prime 800 parole essenziali (famiglia, tempo, azioni).</li>
+            <li>🔒 <strong>Struttura Frase:</strong> Soggetto + Oggetto + Verbo (S-O-V).</li>
+            <li>🔒 <strong>Uso pratico:</strong> Salutare, ordinare cibo, presentarsi.</li>
+        </ul>
+    </div>
+
+    <!-- Livello 2 -->
+    <div class="level-card locked">
+        <div class="level-header">
+            <div class="level-title">📱 Livello 2: Principiante Avanzato (TOPIK 2)</div>
+            <div class="level-badge">~1.500 Vocaboli</div>
+        </div>
+        <div class="level-desc">
+            Inizi a muoverti in autonomia in Corea.
+        </div>
+        <ul class="perks">
+            <li>🔒 <strong>Comunicazione quotidiana:</strong> Ufficio postale, banca, telefono.</li>
+            <li>🔒 <strong>Richieste formali e informali.</strong></li>
+        </ul>
+    </div>
+
+    <!-- Livello 3 -->
+    <div class="level-card locked">
+        <div class="level-header">
+            <div class="level-title">🤝 Livello 3: Intermedio (TOPIK 3)</div>
+            <div class="level-badge">~3.000 Vocaboli</div>
+        </div>
+        <div class="level-desc">
+            Il passaggio dalla lingua quotidiana a quella sociale/pubblica. Inizieremo a introdurre concetti scritti e differenze tra parlato e scritto.
+        </div>
+    </div>
+
+    <!-- Livelli Avanzati -->
+    <div class="level-card locked" style="opacity: 0.4;">
+        <div class="level-header">
+            <div class="level-title">🎓 Livelli 4-6: Avanzato e Fluente</div>
+            <div class="level-badge">6.000+ Vocaboli</div>
+        </div>
+        <div class="level-desc">
+            Capacità di leggere news, esprimere opinioni astratte, lavorare in aziende coreane e frequentare l'università (TOPIK II). Il traguardo finale.
+        </div>
+    </div>
+    
+    <div style="text-align:center; margin-top: 2rem;">
+        <a href="/dashboard" class="btn btn-glass">← Torna alla Dashboard</a>
+    </div>
+</div>
+{% endblock %}
